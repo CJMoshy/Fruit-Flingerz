@@ -1,5 +1,6 @@
-import Phaser, { Scale } from "phaser";
-import World from "./scenes/World"
+import Phaser, { Scale } from "phaser"
+import {io} from "socket.io-client"
+import World from "./frontend/scenes/World"
 
 export const CONFIG = {
     type: Phaser.CANVAS,
@@ -21,14 +22,16 @@ export const CONFIG = {
 
 export let loggedin: boolean = false
 
-
 const GAME: Phaser.Game = new Phaser.Game(CONFIG)
+
+const socket = io('http://localhost:3000/')
 
 document.addEventListener('DOMContentLoaded', (e) => {
     let usernameField = document.getElementById('username-field') as HTMLInputElement
     let passwordField = document.getElementById('password-field') as HTMLInputElement
     document.getElementById('login-btn')?.addEventListener("click", () => {
-        usernameField.value === '' ? console.log('no username') : console.log(usernameField.value)
-        passwordField.value === '' ? console.log('no password') : console.log(passwordField.value)
+        if(usernameField.value !== '' && passwordField.value !== ''){
+            socket.emit('login-msg', {username: usernameField.value, password: passwordField.value})
+        } else console.log('no username or password')
     })
 })
