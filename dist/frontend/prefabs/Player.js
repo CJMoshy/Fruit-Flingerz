@@ -12,12 +12,14 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setCollideWorldBounds(true);
+        this.setGravityY(500);
         this.name = _name;
         this.health = _hitPoints;
         this.VELOCITY = 200;
         this.JUMP_VELOCITY = -300;
-        this.keys = (_a = scene.input.keyboard) === null || _a === void 0 ? void 0 : _a.createCursorKeys();
-        this.moveStatus = '';
+        this.isJumping = false;
+        this.jumpCount = 0;
+        this.keys = (_a = scene.input.keyboard) === null || _a === void 0 ? void 0 : _a.addKeys({ 'left': Phaser.Input.Keyboard.KeyCodes.A, 'right': Phaser.Input.Keyboard.KeyCodes.D, 'up': Phaser.Input.Keyboard.KeyCodes.W });
         this.FSM = new StateMachine_1.default('idle', {
             idle: new idleState(),
             move: new moveState(),
@@ -26,43 +28,49 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
     update(...args) {
         this.FSM.step();
+        this.determineTexture();
     }
     handleMovement() {
         let vector = new Phaser.Math.Vector2(0, 0);
         if (this.keys.left.isDown) {
             this.setFlipX(true);
             vector.x = -1;
-            this.moveStatus = 'left';
+            this.setVelocityX(this.VELOCITY * vector.x);
         }
         if (this.keys.right.isDown) {
             this.setFlipX(false);
             vector.x = 1;
-            this.moveStatus = 'right';
+            this.setVelocityX(this.VELOCITY * vector.x);
         }
-        if (vector.x === 0 && vector.y === 0) {
-            this.moveStatus = 'none';
+    }
+    determineTexture() {
+        var _a, _b;
+        if (((_a = this.body) === null || _a === void 0 ? void 0 : _a.velocity.y) !== undefined && this.body.velocity.y < 0) {
+            this.setTexture('player-01-jump');
         }
-        vector.normalize();
-        this.setVelocity(this.VELOCITY * vector.x, this.VELOCITY * vector.y);
+        else if (((_b = this.body) === null || _b === void 0 ? void 0 : _b.velocity.y) !== undefined && this.body.velocity.y > 0) {
+            this.setTexture('player-01-fall');
+        }
     }
 }
 exports.default = Player;
 class idleState extends StateMachine_2.State {
     enter(scene, player) {
         console.log('in idle player state');
-        player.anims.stop();
         player.anims.play('player01-idle');
     }
     execute(scene, player) {
-        player.setVelocityY(100);
-        if (player.keys.up.isDown) {
-            if (this.stateMachine !== undefined) {
+        var _a;
+        if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
+            if (this.stateMachine !== undefined && player.isJumping === false) {
                 this.stateMachine.transition('jump');
             }
         }
-        if (player.keys.left.isDown || player.keys.right.isDown) {
-            if (this.stateMachine !== undefined) {
-                this.stateMachine.transition('move');
+        if ((_a = player.body) === null || _a === void 0 ? void 0 : _a.blocked.down) {
+            if (player.keys.left.isDown || player.keys.right.isDown) {
+                if (this.stateMachine !== undefined) {
+                    this.stateMachine.transition('move');
+                }
             }
         }
     }
@@ -74,8 +82,8 @@ class moveState extends StateMachine_2.State {
         player.anims.play('player01-run');
     }
     execute(scene, player) {
-        if (player.keys.up.isDown) {
-            if (this.stateMachine !== undefined) {
+        if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
+            if (this.stateMachine !== undefined && player.isJumping === false) {
                 this.stateMachine.transition('jump');
             }
         }
@@ -89,11 +97,18 @@ class moveState extends StateMachine_2.State {
 }
 class jumpState extends StateMachine_2.State {
     enter(scene, player) {
-        console.log('in jump player State');
-        player.setVelocity(0);
-        scene.time.delayedCall(500, () => { var _a; (_a = this.stateMachine) === null || _a === void 0 ? void 0 : _a.transition('idle'); });
+        var _a;
+        console.log('in jump player State', player.jumpCount);
+        player.jumpCount += 1;
+        if (player.jumpCount === 2) {
+            player.anims.stop();
+            player.anims.play('player01-dbJmp');
+            player.isJumping = true;
+        }
+        player.setVelocityY(player.JUMP_VELOCITY);
+        (_a = this.stateMachine) === null || _a === void 0 ? void 0 : _a.transition('idle');
     }
     execute(scene, player) {
-        player.setVelocityY(player.JUMP_VELOCITY);
+        player.handleMovement();
     }
 }

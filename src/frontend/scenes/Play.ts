@@ -31,11 +31,21 @@ export default class Play extends Phaser.Scene {
 
         this.player = new Player(this, 100, 100, 'player-01-idle', 0, undefined, 2)
 
-        this.physics.add.collider(this.player, collisionLayer)
+        this.physics.add.collider(this.player, collisionLayer, () => {
+            if(this.player !== null){
+                this.player.setVelocity(0)
+                if(this.player.body?.blocked.down === true){
+                    this.player.isJumping = false
+                    this.player.jumpCount = 0
+                }
+            }
+        })
     }
 
     update(time: number, delta: number): void {
+        
         this.playScreen.tilePositionY += 1
         this.player?.update()
+        
     }
 }

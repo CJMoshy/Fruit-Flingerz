@@ -4,6 +4,9 @@ import tileset from '../../assets/tileset/Terrain.png'
 import mapData from '../../assets/tileset/level_01.json'
 import player1Idle from '../../assets/spritesheets/char01/char01_idle.png'
 import player1Run from '../../assets/spritesheets/char01/char01_run.png'
+import player1Jmp from '../../assets/img/characters/char01_jmp.png'
+import player1Fall from '../../assets/img/characters/char01_fall.png'
+import player1dbJmp from '../../assets/spritesheets/char01/char01_dbJmp.png'
 import pinkBG from '../../assets/img/backgrounds/Pink.png'
 import grayBG from '../../assets/img/backgrounds/Gray.png'
 import blueBG from '../../assets/img/backgrounds/Blue.png'
@@ -30,9 +33,14 @@ export default class Loader extends Phaser.Scene{
         this.load.image('playBtn', playButton)
         this.load.image('levelBtn', levelButton)
 
-        //player
+        //static player images
+        this.load.image('player-01-jump', player1Jmp)
+        this.load.image('player-01-fall', player1Fall)
+
+        //player spritesheets
         this.load.spritesheet('player-01-idle', player1Idle, {frameWidth: 32, frameHeight: 32})
         this.load.spritesheet('player-01-run', player1Run, {frameWidth: 32, frameHeight: 32})
+        this.load.spritesheet('player-01-dbJmp', player1dbJmp, {frameWidth: 32, frameHeight: 32})
 
         //tilemap stuff, proboably move to loader scene...
         this.load.image('base-tileset', tileset)
@@ -58,6 +66,16 @@ export default class Loader extends Phaser.Scene{
             }),
             frameRate: 20,
             repeat: -1
+        })
+
+        this.anims.create({
+            key: 'player01-dbJmp',
+            frames: this.anims.generateFrameNumbers('player-01-dbJmp', {
+                start: 0,
+                end: 5
+            }),
+            frameRate: 20,
+            repeat: 0
         })
 
         this.scene.start('menuScene')
