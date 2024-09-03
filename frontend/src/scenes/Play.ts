@@ -42,7 +42,7 @@ export default class Play extends Phaser.Scene {
         })
     }
 
-    update(time: number, delta: number): void {
+    update(): void {
         
         this.playScreen.tilePositionY += 1
         this.player?.update()

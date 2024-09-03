@@ -1,0 +1,30 @@
+{
+    "name": "maerio",
+    "version": "1.0.0",
+    "main": "./dist/bundle.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "npx webpack"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "express": "^4.19.2",
+        "phaser": "^3.80.1",
+        "socket.io": "^4.7.5",
+        "socket.io-client": "^4.7.5"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.9.1",
+        "@types/express": "^4.17.21",
+        "eslint": "^9.9.1",
+        "globals": "^15.9.0",
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.4.5",
+        "typescript-eslint": "^8.4.0",
+        "webpack": "^5.92.0",
+        "webpack-cli": "^5.1.4"
+    }
+}

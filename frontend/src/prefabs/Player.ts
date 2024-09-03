@@ -46,7 +46,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     handleMovement() {
 
-        let vector: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0)
+        const vector: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0)
 
         if (this.keys.left.isDown) {
             this.setFlipX(true)
@@ -62,10 +62,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     determineTexture() {
-        if (this.body?.velocity.y !== undefined && this.body.velocity.y < 0) {
-            this.setTexture('player-01-jump')
-        } else if (this.body?.velocity.y !== undefined && this.body.velocity.y > 0) {
-            this.setTexture('player-01-fall')
+        if(!this.anims.isPlaying){
+            if (this.body?.velocity.y !== undefined && this.body.velocity.y < 0) {
+                this.setTexture('player-01-jump')
+            } else if (this.body?.velocity.y !== undefined && this.body.velocity.y > 0) {
+                this.setTexture('player-01-fall')
+            } 
         }
     }
 }
@@ -73,16 +75,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 //idle state
 class idleState extends State {
     enter(scene: Phaser.Scene, player: Player) {
-        console.log('in idle player state')
-        
-        player.anims.play('player01-idle')
-    
+        console.log('in idle player state')     
     }
 
     execute(scene: Phaser.Scene, player: Player) {
-
+        if(player.body?.velocity.y === 0 && !player.anims.isPlaying){
+            player.anims.play('player01-idle') 
+        } else player.determineTexture();
         if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
             if (this.stateMachine !== undefined && player.isJumping === false) {
+                player.anims.stop()
                 this.stateMachine.transition('jump')
             }
         }
@@ -90,6 +92,7 @@ class idleState extends State {
         if(player.body?.blocked.down){
             if (player.keys.left.isDown || player.keys.right.isDown) {
                 if (this.stateMachine !== undefined) {
+                    player.anims.stop()
                     this.stateMachine.transition('move')
                 }
             }
@@ -109,12 +112,14 @@ class moveState extends State {
 
         if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
             if (this.stateMachine !== undefined && player.isJumping === false) {
+                player.anims.stop()
                 this.stateMachine.transition('jump')
             }
         }
 
         if (!(player.keys.left.isDown || player.keys.right.isDown)) {
             if (this.stateMachine !== undefined) {
+                player.anims.stop()
                 this.stateMachine.transition('idle')
             }
         }
@@ -125,12 +130,12 @@ class moveState extends State {
 
 class jumpState extends State {
     enter(scene: Phaser.Scene, player: Player) {
-        console.log('in jump player State', player.jumpCount)
-
         player.jumpCount += 1
-       
+        console.log('in jump player State', player.jumpCount)
+        player.setVelocityY(player.JUMP_VELOCITY)
+
         if (player.jumpCount === 2) {
-            player.anims.stop()
+
             player.anims.play('player01-dbJmp')
             player.isJumping = true
         }
@@ -138,9 +143,7 @@ class jumpState extends State {
         // if (player.body?.velocity.y !== undefined) {
         //     player.setVelocityY(player.body?.velocity.y + player.JUMP_VELOCITY) //hard mode ?
         // }
-        player.setVelocityY(player.JUMP_VELOCITY)
-
-        this.stateMachine?.transition('idle')  
+        setTimeout(()=> this.stateMachine?.transition('idle'), 500)  
     }
 
     execute(scene: Phaser.Scene, player: Player) {

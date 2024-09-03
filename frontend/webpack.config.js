@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
     mode: 'development',
-    entry : './dist/main.js',
+    entry : './src/main.ts',
     module: {
         rules: [
             {

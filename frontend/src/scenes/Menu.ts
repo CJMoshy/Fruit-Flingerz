@@ -24,7 +24,7 @@ export default class Menu extends Phaser.Scene{
         })
     }
 
-    update(time: number, delta: number): void {
+    // update(time: number, delta: number): void {
         
-    }
+    // }
 }
