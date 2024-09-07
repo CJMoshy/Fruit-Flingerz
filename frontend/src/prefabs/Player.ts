@@ -1,5 +1,7 @@
 import StateMachine from "../lib/StateMachine"
 import { State } from "../lib/StateMachine"
+import { socket } from "../main"
+import { init_login_msg } from "../lib/Socket"
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
 
@@ -40,6 +42,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(...args: any[]): void {
+        socket.emit('player-update-event', {
+            user_id: init_login_msg.username,
+            x: this.body?.position.x,
+            y: this.body?.position.y,
+        })
+        
         this.FSM.step()
         this.determineTexture()
     }
