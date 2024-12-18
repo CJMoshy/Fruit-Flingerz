@@ -1,10 +1,10 @@
-import StateMachine from "../lib/StateMachine";
-import { State } from "../lib/StateMachine";
-import { socket } from "../lib/Socket";
-import { init_login_msg } from "../lib/Socket";
+import StateMachine from "../lib/StateMachine.ts";
+import { State } from "../lib/StateMachine.ts";
+import { socket } from "../lib/Socket.ts";
+import { loginMsg } from "../lib/Socket.ts";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-  name: string;
+  user_name: string;
   health: number;
   keys: Phaser.Types.Input.Keyboard.CursorKeys;
   VELOCITY: number;
@@ -31,7 +31,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setGravityY(500);
 
     //base player info
-    this.name = _name;
+    this.user_name = _name;
     this.health = _hitPoints;
 
     //movement logic
@@ -52,9 +52,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }, [scene, this]);
   }
 
-  update(): void {
+  override update(): void {
     socket.emit("player-update-event", {
-      user_id: init_login_msg.username,
+      user_id: loginMsg.username,
       x: this.body?.position.x,
       y: this.body?.position.y,
       currentAnimation: this.anims.currentAnim?.toJSON().key,
@@ -96,11 +96,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 //idle state
 class idleState extends State {
-  enter() {
+  override enter() {
     console.log("in idle player state");
   }
 
-  execute(scene: Phaser.Scene, player: Player) {
+  override execute(scene: Phaser.Scene, player: Player) {
     if (player.body?.velocity.y === 0 && !player.anims.isPlaying) {
       player.anims.play("player01-idle");
     } else player.determineTexture();
@@ -124,13 +124,13 @@ class idleState extends State {
 
 //moving state
 class moveState extends State {
-  enter(scene: Phaser.Scene, player: Player) {
+  override enter(scene: Phaser.Scene, player: Player) {
     console.log("in move player State");
     player.anims.stop();
     player.anims.play("player01-run");
   }
 
-  execute(scene: Phaser.Scene, player: Player) {
+  override execute(scene: Phaser.Scene, player: Player) {
     if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
       if (this.stateMachine !== undefined && player.isJumping === false) {
         player.anims.stop();
@@ -150,7 +150,7 @@ class moveState extends State {
 }
 
 class jumpState extends State {
-  enter(scene: Phaser.Scene, player: Player) {
+  override enter(scene: Phaser.Scene, player: Player) {
     player.jumpCount += 1;
     console.log("in jump player State", player.jumpCount);
     player.setVelocityY(player.JUMP_VELOCITY);
@@ -166,7 +166,7 @@ class jumpState extends State {
     setTimeout(() => this.stateMachine?.transition("idle"), 500);
   }
 
-  execute(scene: Phaser.Scene, player: Player) {
+  override execute(scene: Phaser.Scene, player: Player) {
     player.handleMovement();
   }
 }

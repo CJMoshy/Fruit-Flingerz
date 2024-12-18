@@ -1,5 +1,5 @@
-interface User_Position_Info {
-  user_id: string;
+type UserID = string;
+interface OtherUser {
   position: {
     x: number;
     y: number;
@@ -9,12 +9,12 @@ interface User_Position_Info {
   flipX: boolean;
 }
 
-interface other_player {
+interface otherSprites {
   user_id: string;
   entity: Phaser.Physics.Arcade.Sprite;
 }
 
-interface login_msg {
+interface loginMsg {
   username: string;
   password: string;
 }

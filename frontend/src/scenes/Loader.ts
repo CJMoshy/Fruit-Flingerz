@@ -1,19 +1,13 @@
 import playButton from "../assets/img/buttons/Play.png";
 import levelButton from "../assets/img/buttons/Levels.png";
 import tileset from "../assets/tileset/Terrain.png";
-import mapData from "../assets/tileset/level_01.json";
+import mapData from "../assets/tileset/level_01.json" with { type: "json" };
 import player1Idle from "../assets/spritesheets/char01/char01_idle.png";
 import player1Run from "../assets/spritesheets/char01/char01_run.png";
 import player1Jmp from "../assets/img/characters/char01_jmp.png";
 import player1Fall from "../assets/img/characters/char01_fall.png";
 import player1dbJmp from "../assets/spritesheets/char01/char01_dbJmp.png";
 import pinkBG from "../assets/img/backgrounds/Pink.png";
-// import grayBG from '../../assets/img/backgrounds/Gray.png'
-// import blueBG from '../../assets/img/backgrounds/Blue.png'
-// import brownBG from '../../assets/img/backgrounds/Brown.png'
-// import greenBG from '../../assets/img/backgrounds/Green.png'
-// import purpleBG from '../../assets/img/backgrounds/Purple.png'
-// import yellowBG from '../../assets/img/backgrounds/Yellow.png'
 
 export default class Loader extends Phaser.Scene {
   constructor() {
@@ -48,7 +42,7 @@ export default class Loader extends Phaser.Scene {
       frameHeight: 32,
     });
 
-    //tilemap stuff, proboably move to loader scene...
+    //tilemap stuff
     this.load.image("base-tileset", tileset);
     this.load.tilemapTiledJSON("tilemapJSON", mapData);
   }

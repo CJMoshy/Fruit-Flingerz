@@ -3,13 +3,15 @@ interface User {
   socket: any; // socket.io socket
 }
 
-interface User_Info {
+interface ClientInfo {
   user_id: string;
-  position: {
-    x: number;
-    y: number;
-  };
-  currentAnimation: string | undefined;
-  currentTexture: string | undefined;
-  flipX: boolean;
+  user: {
+    position: {
+      x: number;
+      y: number;
+    };
+    currentAnimation: string | undefined;
+    currentTexture: string | undefined;
+    flipX: boolean;
+  }
 }

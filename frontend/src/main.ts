@@ -1,8 +1,9 @@
 import Phaser from "phaser";
-import Menu from "./scenes/Menu";
-import Play from "./scenes/Play";
-import Loader from "./scenes/Loader";
-import { init_login_msg, socket, users } from "./lib/Socket";
+import Menu from "./scenes/Menu.ts";
+import Play from "./scenes/Play.ts";
+import Loader from "./scenes/Loader.ts";
+import ConnectionManager from "./lib/ConnectionManager.ts";
+import { loginMsg, logUserIn, socket } from "./lib/Socket.ts";
 
 export const CONFIG = {
   type: Phaser.CANVAS,
@@ -25,30 +26,31 @@ export const CONFIG = {
 
 export const loggedin: boolean = false;
 
+export const MultiplayerManager = new ConnectionManager();
+
 document.addEventListener("DOMContentLoaded", () => {
   const usernameField = document.getElementById(
     "username-field",
   ) as HTMLInputElement;
+  usernameField.addEventListener("change", () => {
+    loginMsg.username = usernameField.value;
+  });
   // let passwordField = document.getElementById('password-field') as HTMLInputElement
-  document.getElementById("login-btn")?.addEventListener("click", () => {
-    init_login_msg.username = usernameField.value;
-    if (usernameField.value !== "") { // password not null
-      socket.emit("login-msg", {
-        username: init_login_msg.username,
-        password: "test",
-      });
-      // const GAME: Phaser.Game = new Phaser.Game(CONFIG);
-    } else console.log("no username or password");
+  document.getElementById("login-btn")!.addEventListener("click", () => {
+    console.log("click");
+    if (loginMsg.username !== "") { // password not null
+      logUserIn(loginMsg);
+    } else {
+      console.log("no username or password");
+    }
   });
 });
 
 socket.on("login-response-msg", (msg) => {
   if (msg.status === 200) {
-    for (const x of msg.pos) {
-      console.log(x);
-      users.push(x);
+    for (const user of msg.pos) {
+      MultiplayerManager.addUser(user.id, user);
     }
-    // eslint-disable-next-line
-    const GAME: Phaser.Game = new Phaser.Game(CONFIG);
+    new Phaser.Game(CONFIG);
   }
 });

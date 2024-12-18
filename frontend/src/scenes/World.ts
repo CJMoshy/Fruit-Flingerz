@@ -1,4 +1,4 @@
-import Player from "../prefabs/Player";
+import Player from "../prefabs/Player.ts";
 
 export default class World extends Phaser.Scene {
   private player: Player | null = null;
@@ -17,6 +17,6 @@ export default class World extends Phaser.Scene {
     this.player = new Player(this, 100, 100, "a", 0, undefined, 2);
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
   }
 }

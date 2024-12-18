@@ -15,7 +15,7 @@ const io = new Server(server, {
 }); //* pass in custom url possible..
 
 const users: User[] = [];
-const global_user_information: User_Info[] = [];
+const global_user_information: ClientInfo[] = [];
 
 io.on("connection", (socket) => { // this is the base connection to the server, from any client
   console.log("a user connected"); // log it
@@ -32,13 +32,15 @@ io.on("connection", (socket) => { // this is the base connection to the server, 
       users.push({ id: msg.username, socket: socket });
       const x = {
         user_id: msg.username,
-        position: {
-          x: 0,
-          y: 0,
-        },
-        currentAnimation: undefined,
-        currentTexture: undefined,
-        flipX: false,
+        user: {
+          position: {
+            x: 0,
+            y: 0,
+          },
+          currentAnimation: undefined,
+          currentTexture: undefined,
+          flipX: false,
+        }
       };
       global_user_information.push(x);
       socket.emit("login-response-msg", {
@@ -52,7 +54,8 @@ io.on("connection", (socket) => { // this is the base connection to the server, 
   const send_msg = (index: number) => {
     users.forEach((s: any) => {
       s.socket.emit("global-position-update", {
-        data: global_user_information[index],
+        user_id: global_user_information[index].user_id,
+        user: global_user_information[index].user
       });
     });
   };
@@ -62,11 +65,11 @@ io.on("connection", (socket) => { // this is the base connection to the server, 
     const index = global_user_information.findIndex((e) =>
       e.user_id === msg.user_id
     );
-    global_user_information[index].position.x = msg.x;
-    global_user_information[index].position.y = msg.y;
-    global_user_information[index].currentAnimation = msg.currentAnimation;
-    global_user_information[index].currentTexture = msg.currentTexture;
-    global_user_information[index].flipX = msg.flipX;
+    global_user_information[index].user.position.x = msg.x;
+    global_user_information[index].user.position.y = msg.y;
+    global_user_information[index].user.currentAnimation = msg.currentAnimation;
+    global_user_information[index].user.currentTexture = msg.currentTexture;
+    global_user_information[index].user.flipX = msg.flipX;
     send_msg(index);
   });
 });
