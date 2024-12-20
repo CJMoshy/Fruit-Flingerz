@@ -1,6 +1,6 @@
 export default class ConnectionManager {
   public CONNECTED_PLAYER_COUNT: number;
-  private connectedPlayers: Map<UserID, OtherUser>;
+  private connectedPlayers: Map<UserID, User>;
 
   public CURRENT_SPRITE_COUNT: number;
   private spritePool: Array<otherSprites>;
@@ -8,13 +8,15 @@ export default class ConnectionManager {
   constructor() {
     this.CONNECTED_PLAYER_COUNT = 0;
     this.CURRENT_SPRITE_COUNT = 0;
-    this.connectedPlayers = new Map<UserID, OtherUser>();
+    this.connectedPlayers = new Map<UserID, User>();
     this.spritePool = new Array<otherSprites>();
   }
 
-  addUser(id: UserID, user: OtherUser) {
+  addUser(id: UserID, user: User) {
     if (this.connectedPlayers.has(id)) return;
+    console.log("adding new user to game");
     this.connectedPlayers.set(id, user);
+    console.log(this.connectedPlayers);
     this.CONNECTED_PLAYER_COUNT += 1;
   }
 
@@ -37,7 +39,7 @@ export default class ConnectionManager {
     }
   }
 
-  updateUser(id: UserID, _data: OtherUser) {
+  updateUser(id: UserID, _data: User) {
     this.connectedPlayers.set(id, _data);
   }
 

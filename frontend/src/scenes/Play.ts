@@ -48,6 +48,7 @@ export default class Play extends Phaser.Scene {
   update(): void {
     (this.playScreen as Phaser.GameObjects.TileSprite).tilePositionY += 1;
     if (MultiplayerManager.checkForNewUsers()) {
+      console.log("new user");
       MultiplayerManager.updateSpritePool(this);
     }
     this.player?.update();

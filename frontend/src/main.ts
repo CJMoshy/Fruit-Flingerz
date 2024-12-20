@@ -3,7 +3,7 @@ import Menu from "./scenes/Menu.ts";
 import Play from "./scenes/Play.ts";
 import Loader from "./scenes/Loader.ts";
 import ConnectionManager from "./lib/ConnectionManager.ts";
-import { loginMsg, logUserIn, socket } from "./lib/Socket.ts";
+import { loginMsg, logUserIn} from "./lib/Socket.ts";
 
 export const CONFIG = {
   type: Phaser.CANVAS,
@@ -46,11 +46,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-socket.on("login-response-msg", (msg) => {
-  if (msg.status === 200) {
-    for (const user of msg.pos) {
-      MultiplayerManager.addUser(user.id, user);
-    }
-    new Phaser.Game(CONFIG);
-  }
-});
+document.addEventListener('connectionSuccess', () => new Phaser.Game(CONFIG))

@@ -53,10 +53,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   override update(): void {
-    socket.emit("player-update-event", {
+    socket.emit("playerUpdateEvent", {
       user_id: loginMsg.username,
-      x: this.body?.position.x,
-      y: this.body?.position.y,
+      position: {
+        x: this.x,
+        y: this.y,
+      },
       currentAnimation: this.anims.currentAnim?.toJSON().key,
       currentTexture: this.texture.key,
       flipX: this.flipX,
