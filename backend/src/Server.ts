@@ -15,22 +15,33 @@ const io = new Server(server, {
 }); //* pass in custom url possible..
 
 const users: User[] = [];
-const global_user_information: ClientInfo[] = [];
+const globalUsersList: ClientInfo[] = [];
 
-io.on("connection", (socket) => { // this is the base connection to the server, from any client
-  console.log("a user connected"); // log it
+/**
+ * @param msgName the name/type of message to send
+ * @param msg the message object containg the data
+ */
+function send_msg(msgName: string, msg: any) {
+  users.forEach((user: User) => {
+    user.socket.emit(msgName, msg);
+  });
+}
 
-  socket.on("login-msg", (msg) => { // we can listen for specific messgae types from the client
-    console.log(msg);
+// base connection to the server, from any client
+io.on("connection", (socket) => {
+  console.log("a user connected");
+
+  // listen for specific messgae types from the client
+  socket.on("login-msg", (msg: LoginMessage) => {
+    // check if a user with the same username already exists in the list of current users
     if (users.findIndex((e) => e.id === msg.username) !== -1) {
-      console.log("ok");
+      console.log("A user tried to join that already exists");
       socket.emit("login-response-msg", {
         status: 409,
-        pos: global_user_information,
-      });
-    } else {
+      } as ResponseMessage);
+    } else { // new user
       users.push({ id: msg.username, socket: socket });
-      const x = {
+      const newUserToken: ClientInfo = {
         user_id: msg.username,
         user: {
           position: {
@@ -40,36 +51,34 @@ io.on("connection", (socket) => { // this is the base connection to the server, 
           currentAnimation: undefined,
           currentTexture: undefined,
           flipX: false,
-        }
+        },
       };
-      global_user_information.push(x);
+
+      // add it to server list
+      globalUsersList.push(newUserToken);
+
+      // send a message back to the specific user
       socket.emit("login-response-msg", {
         status: 200,
-        pos: global_user_information,
-      }); //we can send a message back to the specific user
-      io.emit("new-user-msg", x);
+        users: globalUsersList,
+      } as LoginResponseMessage);
+
+      // notify all connected users about the new user
+      io.emit("new-user-msg", newUserToken);
     }
   });
 
-  const send_msg = (index: number) => {
-    users.forEach((s: any) => {
-      s.socket.emit("global-position-update", {
-        user_id: global_user_information[index].user_id,
-        user: global_user_information[index].user
-      });
-    });
-  };
-
   socket.on("player-update-event", (msg) => {
-    console.log(msg.currentTexture);
-    const index = global_user_information.findIndex((e) =>
-      e.user_id === msg.user_id
-    );
-    global_user_information[index].user.position.x = msg.x;
-    global_user_information[index].user.position.y = msg.y;
-    global_user_information[index].user.currentAnimation = msg.currentAnimation;
-    global_user_information[index].user.currentTexture = msg.currentTexture;
-    global_user_information[index].user.flipX = msg.flipX;
-    send_msg(index);
+    const index = globalUsersList.findIndex((e) => e.user_id === msg.user_id);
+    globalUsersList[index].user.position.x = msg.x;
+    globalUsersList[index].user.position.y = msg.y;
+    globalUsersList[index].user.currentAnimation = msg.currentAnimation;
+    globalUsersList[index].user.currentTexture = msg.currentTexture;
+    globalUsersList[index].user.flipX = msg.flipX;
+
+    send_msg("global-position-update", {
+      user_id: globalUsersList[index].user_id,
+      user: globalUsersList[index].user,
+    });
   });
 });

@@ -13,5 +13,17 @@ interface ClientInfo {
     currentAnimation: string | undefined;
     currentTexture: string | undefined;
     flipX: boolean;
-  }
+  };
+}
+
+interface LoginMessage {
+  username: string;
+}
+
+interface ResponseMessage {
+  status: number;
+}
+
+interface LoginResponseMessage extends ResponseMessage {
+  users: ClientInfo[];
 }
