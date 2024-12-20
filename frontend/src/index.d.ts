@@ -11,7 +11,7 @@ interface User {
   flipX: boolean;
 }
 
-interface otherSprites {
+interface OtherSprites {
   user_id: string;
   entity: Phaser.Physics.Arcade.Sprite;
 }

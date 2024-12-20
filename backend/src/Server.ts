@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
         currentTexture: undefined,
         flipX: false,
       };
-      
+
       // add it to server list
       globalUsersList.push(newUserToken);
       console.log(globalUsersList);

@@ -3,13 +3,13 @@ export default class ConnectionManager {
   private connectedPlayers: Map<UserID, User>;
 
   public CURRENT_SPRITE_COUNT: number;
-  private spritePool: Array<otherSprites>;
+  private spritePool: Array<OtherSprites>;
 
   constructor() {
     this.CONNECTED_PLAYER_COUNT = 0;
     this.CURRENT_SPRITE_COUNT = 0;
-    this.connectedPlayers = new Map<UserID, User>();
-    this.spritePool = new Array<otherSprites>();
+    this.connectedPlayers = new Map();
+    this.spritePool = new Array();
   }
 
   addUser(id: UserID, user: User) {

@@ -3,7 +3,7 @@ import Menu from "./scenes/Menu.ts";
 import Play from "./scenes/Play.ts";
 import Loader from "./scenes/Loader.ts";
 import ConnectionManager from "./lib/ConnectionManager.ts";
-import { loginMsg, logUserIn} from "./lib/Socket.ts";
+import { loginMsg, logUserIn } from "./lib/Socket.ts";
 
 export const CONFIG = {
   type: Phaser.CANVAS,
@@ -46,4 +46,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-document.addEventListener('connectionSuccess', () => new Phaser.Game(CONFIG))
+document.addEventListener("connectionSuccess", () => new Phaser.Game(CONFIG));
