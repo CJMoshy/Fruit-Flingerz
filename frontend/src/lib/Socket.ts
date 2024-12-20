@@ -8,7 +8,9 @@ export const loginMsg: LoginMessage = {
 };
 
 const URL = "http://localhost:3000";
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(URL);
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+  URL,
+);
 
 socket.on("connect", () => {
   console.log("conncted");

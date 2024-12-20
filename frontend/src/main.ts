@@ -29,21 +29,23 @@ export const loggedin: boolean = false;
 export const MultiplayerManager = new ConnectionManager();
 
 document.addEventListener("DOMContentLoaded", () => {
-  const usernameField = document.getElementById(
-    "username-field",
-  ) as HTMLInputElement;
-  usernameField.addEventListener("change", () => {
-    loginMsg.username = usernameField.value;
-  });
-  // let passwordField = document.getElementById('password-field') as HTMLInputElement
-  document.getElementById("login-btn")!.addEventListener("click", () => {
-    console.log("click");
-    if (loginMsg.username !== "") { // password not null
-      logUserIn(loginMsg);
-    } else {
-      console.log("no username or password");
-    }
-  });
+  new Phaser.Game(CONFIG)
+  // const usernameField = document.getElementById(
+  //   "username-field",
+  // ) as HTMLInputElement;
+  // usernameField.addEventListener("change", () => {
+  //   loginMsg.username = usernameField.value;
+  // });
+  // // let passwordField = document.getElementById('password-field') as HTMLInputElement
+  // document.getElementById("login-btn")!.addEventListener("click", () => {
+  //   console.log("click");
+  //   if (loginMsg.username !== "") {
+  //     logUserIn(loginMsg);
+  //   } else {
+  //     console.log("no username or password");
+  //   }
+  // });
 });
 
-document.addEventListener("connectionSuccess", () => new Phaser.Game(CONFIG));
+// document.addEventListener("connectionSuccess", () => new Phaser.Game(CONFIG));
+

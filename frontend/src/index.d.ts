@@ -1,7 +1,7 @@
 type UserID = string;
 
 interface User {
-  user_id: string;
+  user_id: UserID 
   position: {
     x: number;
     y: number;
@@ -46,8 +46,6 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
-  noArg: () => void;
-  basicEmit: (a: number, b: string, c: Buffer) => void;
   loginMsg: (msg: loginMsg) => void;
   playerUpdateEvent: (msg: User) => void;
 }
