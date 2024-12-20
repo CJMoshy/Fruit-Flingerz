@@ -1,3 +1,8 @@
+/**
+ * Provided by @author Nathan Altice // (UCSC cmpm dept. winter 24')
+ * Converted to typescript by @author CJ Moshy
+ */
+
 /*
 - `possibleStates` is an object whose keys refer to the state name and whose values are instances of the `State` class (or subclasses). The class assigns the `stateMachine` property on each instance so they can call `this.stateMachine.transition` whenever they want to trigger a transition.
 - `stateArgs` is a list of arguments passed to the `enter` and `execute` functions. This allows us to pass commonly-used values (such as a sprite object or current Phaser Scene) to the state methods.
@@ -5,13 +10,13 @@
 export default class StateMachine {
   initialState: string;
   possibleStates: { [key: string]: State };
-  stateArgs: any[];
+  stateArgs: [Phaser.Scene, Phaser.Physics.Arcade.Sprite]; //  any[] can keep things more generic if needed
   state: string | null;
 
   constructor(
     initialState: string,
     possibleStates: { [key: string]: State },
-    stateArgs: any[],
+    stateArgs: [Phaser.Scene, Phaser.Physics.Arcade.Sprite],
   ) {
     this.initialState = initialState;
     this.possibleStates = possibleStates;
@@ -46,8 +51,8 @@ export default class StateMachine {
 }
 
 // parent class structure for all `State` subclasses
-export class State {
-  stateMachine: StateMachine | undefined;
+export abstract class State {
+  stateMachine!: StateMachine;
 
   enter(...args: any) {
     // this code happens *once* when we enter the state
