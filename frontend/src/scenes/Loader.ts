@@ -14,6 +14,17 @@ import player2Run from "../assets/spritesheets/char02/char02_run.png";
 import player2Jmp from "../assets/img/characters/char02/char02_jmp.png";
 import player2Fall from "../assets/img/characters/char02/char02_fall.png";
 import player2dbJmp from "../assets/spritesheets/char02/char02_dbJmp.png";
+import player3Idle from "../assets/spritesheets/char03/char03_idle.png";
+import player3Run from "../assets/spritesheets/char03/char03_run.png";
+import player3Jmp from "../assets/img/characters/char03/char03_jmp.png";
+import player3Fall from "../assets/img/characters/char03/char03_fall.png";
+import player3dbJmp from "../assets/spritesheets/char03/char03_dbJmp.png";
+import player4Idle from "../assets/spritesheets/char04/char04_idle.png";
+import player4Run from "../assets/spritesheets/char04/char04_run.png";
+import player4Jmp from "../assets/img/characters/char04/char04_jmp.png";
+import player4Fall from "../assets/img/characters/char04/char04_fall.png";
+import player4dbJmp from "../assets/spritesheets/char04/char04_dbJmp.png";
+
 import pinkBG from "../assets/img/backgrounds/Pink.png";
 import blueBG from "../assets/img/backgrounds/blue.png";
 import grayBG from "../assets/img/backgrounds/gray.png";
@@ -46,6 +57,11 @@ export default class Loader extends Phaser.Scene {
     this.load.image("player-01-fall", player1Fall);
     this.load.image("player-02-jump", player2Jmp);
     this.load.image("player-02-fall", player2Fall);
+    this.load.image("player-03-jump", player3Jmp);
+    this.load.image("player-03-fall", player3Fall);
+    this.load.image("player-04-jump", player4Jmp);
+    this.load.image("player-04-fall", player4Fall);
+
 
     //player spritesheets
     //p1
@@ -72,6 +88,34 @@ export default class Loader extends Phaser.Scene {
       frameHeight: 32,
     });
     this.load.spritesheet("player-02-dbJmp", player2dbJmp, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    //p3
+    this.load.spritesheet("player-03-idle", player3Idle, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("player-03-run", player3Run, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("player-03-dbJmp", player3dbJmp, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    //p4
+    this.load.spritesheet("player-04-idle", player4Idle, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("player-04-run", player4Run, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("player-04-dbJmp", player4dbJmp, {
       frameWidth: 32,
       frameHeight: 32,
     });
@@ -135,6 +179,67 @@ export default class Loader extends Phaser.Scene {
     this.anims.create({
       key: "player02-dbJmp",
       frames: this.anims.generateFrameNumbers("player-02-dbJmp", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+
+    
+    this.anims.create({
+      key: "player03-idle",
+      frames: this.anims.generateFrameNumbers("player-03-idle", {
+        start: 0,
+        end: 10,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "player03-run",
+      frames: this.anims.generateFrameNumbers("player-03-run", {
+        start: 0,
+        end: 11,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "player03-dbJmp",
+      frames: this.anims.generateFrameNumbers("player-03-dbJmp", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+
+    this.anims.create({
+      key: "player04-idle",
+      frames: this.anims.generateFrameNumbers("player-04-idle", {
+        start: 0,
+        end: 10,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "player04-run",
+      frames: this.anims.generateFrameNumbers("player-04-run", {
+        start: 0,
+        end: 11,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "player04-dbJmp",
+      frames: this.anims.generateFrameNumbers("player-04-dbJmp", {
         start: 0,
         end: 5,
       }),
