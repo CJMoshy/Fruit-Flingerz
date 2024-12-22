@@ -4,6 +4,12 @@ export default class Menu extends Phaser.Scene {
   private texturesMapping: Array<[BackgroundColor, CharacterModel]>;
   private characterImage!: Phaser.GameObjects.Sprite;
   private characterTextureCount: number;
+  private selectButton!: Phaser.GameObjects.Image;
+
+  private isLockedIn: Boolean;
+
+  private playBtn!: Phaser.GameObjects.Image;
+
   constructor() {
     super({ key: "menuScene" });
 
@@ -15,6 +21,7 @@ export default class Menu extends Phaser.Scene {
       ["BG-gray", "player04"],
     );
     this.characterTextureCount = 0;
+    this.isLockedIn = false;
   }
 
   init(): void {}
@@ -25,11 +32,17 @@ export default class Menu extends Phaser.Scene {
   create(): void {
     let selectedMapping = this.texturesMapping[this.characterTextureCount];
     if (selectedMapping[0]) {
-      this.scrollingScreen = this.add.tileSprite(0, 0, 800, 640, "BG-pink")
+      this.scrollingScreen = this.add.tileSprite(
+        0,
+        0,
+        800,
+        640,
+        selectedMapping[0],
+      )
         .setOrigin(0);
     }
 
-    this.add.image(
+    this.playBtn = this.add.image(
       (this.sys.canvas.width / 4) - this.LEVELPADDING,
       this.LEVELPADDING,
       "playBtn",
@@ -72,18 +85,48 @@ export default class Menu extends Phaser.Scene {
     };
 
     this.add.image(
-      this.sys.canvas.width / 2 + 100,
+      this.sys.canvas.width / 2 + 150,
       this.sys.canvas.height / 2 + 250,
       "nextBtn",
     ).setInteractive().on("pointerdown", () => {
+      if (this.isLockedIn) return;
       seekCharacter(true);
     });
     this.add.image(
-      this.sys.canvas.width / 2 - 100,
+      this.sys.canvas.width / 2 - 150,
       this.sys.canvas.height / 2 + 250,
       "prevBtn",
     ).setInteractive().on("pointerdown", () => {
+      if (this.isLockedIn) return;
       seekCharacter(false);
+    });
+
+    this.selectButton = this.add.image(
+      this.sys.canvas.width / 2,
+      this.sys.canvas.height / 2 + 250,
+      "selectNoHover",
+    ).setInteractive().on(
+      "pointerover",
+      () => {
+        if (this.isLockedIn) return;
+        this.selectButton.setTexture("selectHover");
+      },
+    ).on("pointerout", () => {
+      if (this.isLockedIn) return;
+      this.selectButton.setTexture("selectNoHover");
+    }).on("pointerdown", () => {
+      if (!this.isLockedIn) {
+        this.isLockedIn = true;
+        this.selectButton.setTexture("selectLocked");
+        this.playBtn.setAlpha(1).setInteractive().on("pointerdown", () => {
+          console.log("Game would start but the code is commented out");
+          //this.scene.start('playScene')
+        });
+      } else {
+        this.isLockedIn = false;
+        this.selectButton.setTexture("selectHover");
+        this.playBtn.setAlpha(0).removeInteractive();
+      }
     });
   }
 
