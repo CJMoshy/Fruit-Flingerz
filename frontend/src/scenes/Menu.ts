@@ -13,7 +13,6 @@ export default class Menu extends Phaser.Scene {
       ["BG-blue", "player02"],
       ["BG-green", "player03"],
       ["BG-gray", "player04"],
-      // ["BG-purple", "player-05"],
     );
     this.characterTextureCount = 0;
   }

@@ -62,7 +62,6 @@ export default class Loader extends Phaser.Scene {
     this.load.image("player-04-jump", player4Jmp);
     this.load.image("player-04-fall", player4Fall);
 
-
     //player spritesheets
     //p1
     this.load.spritesheet("player-01-idle", player1Idle, {
@@ -186,7 +185,6 @@ export default class Loader extends Phaser.Scene {
       repeat: 0,
     });
 
-    
     this.anims.create({
       key: "player03-idle",
       frames: this.anims.generateFrameNumbers("player-03-idle", {

@@ -29,7 +29,7 @@ export const loggedin: boolean = false;
 export const MultiplayerManager = new ConnectionManager();
 
 document.addEventListener("DOMContentLoaded", () => {
-  new Phaser.Game(CONFIG)
+  new Phaser.Game(CONFIG);
   // const usernameField = document.getElementById(
   //   "username-field",
   // ) as HTMLInputElement;
@@ -48,4 +48,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // document.addEventListener("connectionSuccess", () => new Phaser.Game(CONFIG));
-

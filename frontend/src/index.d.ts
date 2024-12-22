@@ -1,7 +1,7 @@
 type UserID = string;
 
 interface User {
-  user_id: UserID 
+  user_id: UserID;
   position: {
     x: number;
     y: number;
