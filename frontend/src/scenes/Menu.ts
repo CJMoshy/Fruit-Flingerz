@@ -48,18 +48,14 @@ export default class Menu extends Phaser.Scene {
       "playBtn",
       0,
     ).setAlpha(0);
-    // .on("pointerdown", () => {
-    //   console.log("click on play btn");
-    //   this.scene.start("playScene");
+    // this.add.image(
+    //   (this.sys.canvas.width) - this.LEVELPADDING,
+    //   this.LEVELPADDING,
+    //   "levelBtn",
+    //   0,
+    // ).setInteractive().on("pointerdown", () => {
+    //   console.log("click on level btn does nothing rn but would maybe show maps or something idk");
     // });
-    this.add.image(
-      (this.sys.canvas.width) - this.LEVELPADDING,
-      this.LEVELPADDING,
-      "levelBtn",
-      0,
-    ).setInteractive().on("pointerdown", () => {
-      console.log("click on level btn");
-    });
 
     this.characterImage = this.add.sprite(
       this.game.config.width as number / 2,

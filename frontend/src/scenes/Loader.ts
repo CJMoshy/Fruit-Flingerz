@@ -31,9 +31,9 @@ import grayBG from "../assets/img/backgrounds/gray.png";
 import greenBG from "../assets/img/backgrounds/green.png";
 import purpleBG from "../assets/img/backgrounds/purple.png";
 
-import selectNoHover from '../assets/img/buttons/select/select_no_hover.png'
-import selectHover from '../assets/img/buttons/select/select_hover.png'
-import selectLocked from '../assets/img/buttons/select/select_locked.png'
+import selectNoHover from "../assets/img/buttons/select/select_no_hover.png";
+import selectHover from "../assets/img/buttons/select/select_hover.png";
+import selectLocked from "../assets/img/buttons/select/select_locked.png";
 
 export default class Loader extends Phaser.Scene {
   constructor() {
@@ -55,10 +55,10 @@ export default class Loader extends Phaser.Scene {
     this.load.image("levelBtn", levelButton);
     this.load.image("nextBtn", nextButton);
     this.load.image("prevBtn", prevButton);
-    this.load.image('selectNoHover', selectNoHover)
-    this.load.image('selectHover', selectHover)
-    this.load.image('selectLocked', selectLocked)
-    
+    this.load.image("selectNoHover", selectNoHover);
+    this.load.image("selectHover", selectHover);
+    this.load.image("selectLocked", selectLocked);
+
     //static player images
     this.load.image("player-01-jump", player1Jmp);
     this.load.image("player-01-fall", player1Fall);
