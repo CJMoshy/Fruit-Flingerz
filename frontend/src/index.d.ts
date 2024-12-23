@@ -12,7 +12,7 @@ interface User {
 }
 
 interface OtherSprites {
-  user_id: string;
+  user_id: UserID;
   entity: Phaser.Physics.Arcade.Sprite;
 }
 

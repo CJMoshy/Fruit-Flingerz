@@ -1,0 +1,39 @@
+#phaser-game {
+  margin-top: 10px;
+  justify-self: center;
+  width: 1000px;
+  height: 800px;
+  background-color: black;
+  border-radius: 20%;
+}
+
+.login-container {
+  margin-top: 20px;
+  justify-self: center;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.password-container {
+  position: relative;
+  display: inline-block;
+}
+
+.password-container input {
+  padding-right: 40px;
+}
+
+.password-container button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.password-container button:focus {
+  outline: none;
+}

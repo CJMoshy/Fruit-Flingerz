@@ -26,7 +26,7 @@ export const CONFIG = {
 
 export const loggedin: boolean = false;
 
-export const MultiplayerManager = new ConnectionManager();
+export const connectionManager = new ConnectionManager();
 
 document.addEventListener("DOMContentLoaded", () => {
   // new Phaser.Game(CONFIG);

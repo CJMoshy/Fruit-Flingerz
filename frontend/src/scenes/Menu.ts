@@ -48,7 +48,7 @@ export default class Menu extends Phaser.Scene {
       "playBtn",
       0,
     ).setAlpha(0);
-  
+
     this.characterImage = this.add.sprite(
       this.game.config.width as number / 2,
       this.game.config.height as number / 2,

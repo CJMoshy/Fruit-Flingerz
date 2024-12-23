@@ -1,5 +1,5 @@
 import Player from "../prefabs/Player.ts";
-import { MultiplayerManager } from "../main.ts";
+import { connectionManager } from "../main.ts";
 
 export default class Play extends Phaser.Scene {
   private player!: Player;
@@ -12,7 +12,7 @@ export default class Play extends Phaser.Scene {
     this.selectedCharModel = "player01"; // default to player1 if for some reason things went bad and they got to this scene without selecting a charater
   }
 
-  init(data: {char: CharacterModel}): void {
+  init(data: { char: CharacterModel }): void {
     this.selectedCharModel = data.char;
   }
   preload(): void {}
@@ -24,7 +24,7 @@ export default class Play extends Phaser.Scene {
         .setOrigin(0);
     }
 
-    MultiplayerManager.createUsers(this);
+    connectionManager.createUsers(this);
 
     const map = this.add.tilemap("tilemapJSON");
     const tileset = map.addTilesetImage(
@@ -60,11 +60,11 @@ export default class Play extends Phaser.Scene {
 
   update(): void {
     (this.playScreen as Phaser.GameObjects.TileSprite).tilePositionY += 1;
-    if (MultiplayerManager.checkForNewUsers()) {
+    if (connectionManager.checkForNewUsers()) {
       console.log("new user");
-      MultiplayerManager.updateSpritePool(this);
+      connectionManager.updateSpritePool(this);
     }
     this.player?.update();
-    MultiplayerManager.updateSpritePoolGameState();
+    connectionManager.updateSpritePoolGameState();
   }
 }

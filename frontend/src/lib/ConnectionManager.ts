@@ -53,20 +53,21 @@ export default class ConnectionManager {
   updateSpritePoolGameState(): void {
     if (this.spritePool.length === 0) return;
     for (const spr of this.spritePool) {
-      const xIndex = this.connectedPlayers.get(spr.user_id)?.position.x;
-      const yIndex = this.connectedPlayers.get(spr.user_id)?.position.y;
+      const xPos = this.connectedPlayers.get(spr.user_id)?.position.x;
+      const yPos = this.connectedPlayers.get(spr.user_id)?.position.y;
       const animKey = this.connectedPlayers.get(spr.user_id)?.currentAnimation;
       const currentTexture = this.connectedPlayers.get(spr.user_id)
         ?.currentTexture;
       const xFlip = this.connectedPlayers.get(spr.user_id)?.flipX; // careful
 
       spr.entity.setFlipX(xFlip as boolean);
-      spr.entity.setX(xIndex);
-      spr.entity.setY(yIndex);
+      spr.entity.setX(xPos);
+      spr.entity.setY(yPos);
 
       if (
-        currentTexture === "player-01-jump" ||
-        currentTexture === "player-01-fall"
+        // are you serious cj what a fucking joke
+        currentTexture?.includes("-jump") ||
+        currentTexture?.includes("-fall")
       ) {
         spr.entity.setTexture(currentTexture);
       } else {
@@ -74,9 +75,6 @@ export default class ConnectionManager {
           spr.entity.anims.play(animKey as string);
         }
       }
-      // if (us.entity.anims.currentAnim?.toJSON().key !== animKey) {
-      //   us.entity.anims.play(animKey as string);
-      // }
     }
   }
 }

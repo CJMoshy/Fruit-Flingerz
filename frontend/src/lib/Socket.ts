@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client";
 
-import { MultiplayerManager } from "../main.ts";
+import { connectionManager } from "../main.ts";
 
 export const loginMsg: LoginMessage = {
   username: "",
@@ -17,16 +17,14 @@ socket.on("connect", () => {
 });
 
 socket.on("loginResponseMsg", (msg) => {
-  console.log("here");
   if (msg.status === 409) {
     alert("Error Logging In. A user with this name already exists");
     console.error("Error Logging In. A user with this name already exists");
   }
   for (const user of msg.users) {
     if (user.user_id! === loginMsg.username) continue;
-    MultiplayerManager.addUser(user.user_id!, user);
+    connectionManager.addUser(user.user_id!, user);
   }
-  // new Phaser.Game(CONFIG); emit event
   document.dispatchEvent(new Event("connectionSuccess"));
 });
 
@@ -37,7 +35,7 @@ socket.on("newUserMsg", (msg) => {
     console.log("new user message id is same");
     return;
   }
-  MultiplayerManager.addUser(msg.user.user_id!, msg.user);
+  connectionManager.addUser(msg.user.user_id!, msg.user);
 });
 
 socket.on("globalPositionUpdateMsg", (msg) => {
@@ -45,7 +43,7 @@ socket.on("globalPositionUpdateMsg", (msg) => {
     console.log("update message id is same");
     return;
   }
-  MultiplayerManager.updateUser(msg.id, msg.data);
+  connectionManager.updateUser(msg.id, msg.data);
 });
 
 export function logUserIn(loginMsg: LoginMessage) {
