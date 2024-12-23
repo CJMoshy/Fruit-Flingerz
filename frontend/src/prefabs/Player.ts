@@ -13,6 +13,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   jumpCount: number;
   FSM: StateMachine;
 
+  charModel: string;
+
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -29,6 +31,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     this.setCollideWorldBounds(true);
     this.setGravityY(500);
+
+    //game things
+    this.charModel = texture;
 
     //base player info
     this.user_name = _name;
@@ -86,11 +91,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   determineTexture() {
     if (!this.anims.isPlaying) {
       if (this.body?.velocity.y !== undefined && this.body.velocity.y < 0) {
-        this.setTexture("player-01-jump");
+        this.setTexture(`${this.charModel}-jump`);
       } else if (
         this.body?.velocity.y !== undefined && this.body.velocity.y > 0
       ) {
-        this.setTexture("player-01-fall");
+        this.setTexture(`${this.charModel}-fall`);
       }
     }
   }
@@ -104,7 +109,7 @@ class idleState extends State {
 
   override execute(scene: Phaser.Scene, player: Player) {
     if (player.body?.velocity.y === 0 && !player.anims.isPlaying) {
-      player.anims.play("player01-idle");
+      player.anims.play(`${player.charModel}-idle`);
     } else player.determineTexture();
     if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
       if (this.stateMachine !== undefined && player.isJumping === false) {
@@ -129,7 +134,7 @@ class moveState extends State {
   override enter(scene: Phaser.Scene, player: Player) {
     console.log("in move player State");
     player.anims.stop();
-    player.anims.play("player01-run");
+    player.anims.play(`${player.charModel}-run`);
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
@@ -158,7 +163,7 @@ class jumpState extends State {
     player.setVelocityY(player.JUMP_VELOCITY);
 
     if (player.jumpCount === 2) {
-      player.anims.play("player01-dbJmp");
+      player.anims.play(`${player.charModel}-dbJmp`);
       player.isJumping = true;
     }
 

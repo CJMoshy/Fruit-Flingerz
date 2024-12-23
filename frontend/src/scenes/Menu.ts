@@ -116,7 +116,7 @@ export default class Menu extends Phaser.Scene {
         this.selectButton.setTexture("selectLocked");
         this.playBtn.setAlpha(1).setInteractive().on("pointerdown", () => {
           console.log("Game would start but the code is commented out");
-          //this.scene.start('playScene')
+          this.scene.start("playScene", { char: selectedMapping[1] });
         });
       } else {
         this.isLockedIn = false;

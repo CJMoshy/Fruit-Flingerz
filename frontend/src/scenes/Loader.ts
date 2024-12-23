@@ -60,14 +60,14 @@ export default class Loader extends Phaser.Scene {
     this.load.image("selectLocked", selectLocked);
 
     //static player images
-    this.load.image("player-01-jump", player1Jmp);
-    this.load.image("player-01-fall", player1Fall);
-    this.load.image("player-02-jump", player2Jmp);
-    this.load.image("player-02-fall", player2Fall);
-    this.load.image("player-03-jump", player3Jmp);
-    this.load.image("player-03-fall", player3Fall);
-    this.load.image("player-04-jump", player4Jmp);
-    this.load.image("player-04-fall", player4Fall);
+    this.load.image("player01-jump", player1Jmp);
+    this.load.image("player01-fall", player1Fall);
+    this.load.image("player02-jump", player2Jmp);
+    this.load.image("player02-fall", player2Fall);
+    this.load.image("player03-jump", player3Jmp);
+    this.load.image("player03-fall", player3Fall);
+    this.load.image("player04-jump", player4Jmp);
+    this.load.image("player04-fall", player4Fall);
 
     //player spritesheets
     //p1

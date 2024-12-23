@@ -5,11 +5,18 @@ export default class Play extends Phaser.Scene {
   private player!: Player;
   private playScreen!: Phaser.GameObjects.TileSprite;
 
+  private selectedChar: string;
+
   constructor() {
     super({ key: "playScene" });
-  }
 
-  init(): void {}
+    this.selectedChar = "player01"; // default to player1 if for some reason things went bad and they got to this scene without selecting a charater
+  }
+  //TODO fix shape of obj type def
+  init(data: any): void {
+    console.log(data.char);
+    this.selectedChar = data.char;
+  }
   preload(): void {}
 
   create(): void {
@@ -32,7 +39,15 @@ export default class Play extends Phaser.Scene {
     ) as Phaser.Tilemaps.TilemapLayer;
     collisionLayer.setCollisionByProperty({ collides: true });
 
-    this.player = new Player(this, 100, 100, "player-01-idle", 0, undefined, 2);
+    this.player = new Player(
+      this,
+      100,
+      100,
+      this.selectedChar,
+      0,
+      undefined,
+      2,
+    );
 
     this.physics.add.collider(this.player, collisionLayer, () => {
       if (this.player !== null) {
