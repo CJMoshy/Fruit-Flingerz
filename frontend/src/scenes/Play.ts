@@ -4,18 +4,16 @@ import { MultiplayerManager } from "../main.ts";
 export default class Play extends Phaser.Scene {
   private player!: Player;
   private playScreen!: Phaser.GameObjects.TileSprite;
-
-  private selectedChar: string;
+  private selectedCharModel: string;
 
   constructor() {
     super({ key: "playScene" });
 
-    this.selectedChar = "player01"; // default to player1 if for some reason things went bad and they got to this scene without selecting a charater
+    this.selectedCharModel = "player01"; // default to player1 if for some reason things went bad and they got to this scene without selecting a charater
   }
-  //TODO fix shape of obj type def
-  init(data: any): void {
-    console.log(data.char);
-    this.selectedChar = data.char;
+
+  init(data: {char: CharacterModel}): void {
+    this.selectedCharModel = data.char;
   }
   preload(): void {}
 
@@ -43,7 +41,7 @@ export default class Play extends Phaser.Scene {
       this,
       100,
       100,
-      this.selectedChar,
+      this.selectedCharModel,
       0,
       undefined,
       2,

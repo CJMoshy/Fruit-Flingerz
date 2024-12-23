@@ -13,7 +13,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   jumpCount: number;
   FSM: StateMachine;
 
-  charModel: string;
+  charModel: CharacterModel;
 
   constructor(
     scene: Phaser.Scene,
@@ -33,7 +33,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setGravityY(500);
 
     //game things
-    this.charModel = texture;
+    this.charModel = texture as CharacterModel; // this is a shitty way of doing it but it works
 
     //base player info
     this.user_name = _name;

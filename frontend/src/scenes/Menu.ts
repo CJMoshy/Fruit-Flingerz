@@ -1,5 +1,5 @@
 export default class Menu extends Phaser.Scene {
-  LEVELPADDING: number;
+  private LEVELPADDING: number;
   private scrollingScreen!: Phaser.GameObjects.TileSprite;
   private texturesMapping: Array<[BackgroundColor, CharacterModel]>;
   private characterImage!: Phaser.GameObjects.Sprite;
@@ -31,7 +31,7 @@ export default class Menu extends Phaser.Scene {
 
   create(): void {
     let selectedMapping = this.texturesMapping[this.characterTextureCount];
-    if (selectedMapping[0]) {
+    if (this.textures.exists(selectedMapping[0])) {
       this.scrollingScreen = this.add.tileSprite(
         0,
         0,
@@ -48,15 +48,7 @@ export default class Menu extends Phaser.Scene {
       "playBtn",
       0,
     ).setAlpha(0);
-    // this.add.image(
-    //   (this.sys.canvas.width) - this.LEVELPADDING,
-    //   this.LEVELPADDING,
-    //   "levelBtn",
-    //   0,
-    // ).setInteractive().on("pointerdown", () => {
-    //   console.log("click on level btn does nothing rn but would maybe show maps or something idk");
-    // });
-
+  
     this.characterImage = this.add.sprite(
       this.game.config.width as number / 2,
       this.game.config.height as number / 2,
@@ -115,7 +107,7 @@ export default class Menu extends Phaser.Scene {
         this.isLockedIn = true;
         this.selectButton.setTexture("selectLocked");
         this.playBtn.setAlpha(1).setInteractive().on("pointerdown", () => {
-          console.log("Game would start but the code is commented out");
+          // console.log("Game would start but the code is commented out");
           this.scene.start("playScene", { char: selectedMapping[1] });
         });
       } else {
