@@ -16,6 +16,12 @@ socket.on("connect", () => {
   console.log("conncted");
 });
 
+socket.on("connect_error", (err) => {
+  console.error("error connecting", err);
+  alert("World Server Down!");
+  socket.disconnect();
+});
+
 socket.on("loginResponseMsg", (msg) => {
   if (msg.status === 409) {
     alert("Error Logging In. A user with this name already exists");

@@ -25,7 +25,7 @@ const globalUsersList: User[] = [];
  * @param msg the message object containg the data
  */
 function send_msg(msgName: string, msg: Message) {
-  users.forEach((user: ConnectedUser) => {
+  users.forEach((user) => {
     user.socket.emit(msgName, msg);
   });
 }
@@ -34,8 +34,7 @@ function send_msg(msgName: string, msg: Message) {
 io.on("connection", (socket) => {
   console.log("a user connected");
   // listen for specific messgae types from the client
-  socket.on("loginMsg", (msg: LoginMesssage) => {
-    console.log(msg);
+  socket.on("loginMsg", (msg) => {
     // check if a user with the same username already exists in the list of current users
     if (users.findIndex((e) => e.id === msg.username) !== -1) {
       console.log("A user tried to join that already exists");
@@ -71,6 +70,7 @@ io.on("connection", (socket) => {
 
   socket.on("playerUpdateEvent", (msg) => {
     const index = globalUsersList.findIndex((e) => e.user_id === msg.user_id);
+    // globalUsersList[index] = msg; TEST THIS
     globalUsersList[index].position.x = msg.position.x;
     globalUsersList[index].position.y = msg.position.y;
     globalUsersList[index].currentAnimation = msg.currentAnimation;
