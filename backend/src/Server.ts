@@ -17,7 +17,10 @@ const io = new Server<
   },
 }); //* pass in custom url possible..
 
+// this is the list of the sockets we iterate through to nofity connected users
 const users: ConnectedUser[] = [];
+
+// this contains the data about user sprites in game
 const spritesList: User[] = [];
 
 /**
@@ -68,8 +71,10 @@ io.on("connection", (socket) => {
     }
   });
 
+  // emitted when a user disconnects from the server
   socket.on("disconnect", () => {
     console.log("socket disconnected from server");
+    // find the user in the socket list
     const userToDisconnectIndex = users.findIndex((user) =>
       user.socket === socket
     );
@@ -79,9 +84,9 @@ io.on("connection", (socket) => {
       );
       return;
     }
-    const removedUser = users.splice(userToDisconnectIndex, 1);
+    const removedUser = users.splice(userToDisconnectIndex, 1); // remove user
 
-    console.log(removedUser[0].id, spritesList);
+    // find the users sprite in the sprite list
     const spriteDataIndex = spritesList.findIndex((user) =>
       user.user_id === removedUser[0].id
     );
@@ -92,9 +97,10 @@ io.on("connection", (socket) => {
       );
       return;
     }
-
+    // remove the sprite
     spritesList.splice(spriteDataIndex, 1);
-
+    
+    // only emit the user dc message once both have been removed TODO fix more clean logic 
     io.emit("userDisconnectMsg", { id: removedUser[0].id });
   });
 
