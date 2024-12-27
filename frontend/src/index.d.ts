@@ -33,6 +33,10 @@ interface NewUserMessage extends Message {
   user: User;
 }
 
+interface UserDCMessage extends Message {
+  id: UserID;
+}
+
 interface GlobalPositionUpdateMsg extends Message {
   id: UserID;
   data: User; // FIX THIS MAKE DATA TYPE AND PASS THAT
@@ -43,6 +47,7 @@ interface ServerToClientEvents {
   newUserMsg: (msg: NewUserMessage) => void;
   globalPositionUpdateMsg: (msg: GlobalPositionUpdateMsg) => void;
   loginResponseMsg: (msg: LoginResponseMessage) => void;
+  userDisconnectMsg: (msg: UserDCMessage) => void;
 }
 
 interface ClientToServerEvents {

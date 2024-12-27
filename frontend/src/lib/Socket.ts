@@ -44,6 +44,11 @@ socket.on("newUserMsg", (msg) => {
   connectionManager.addUser(msg.user.user_id!, msg.user);
 });
 
+socket.on("userDisconnectMsg", (msg) => {
+  console.log("user disconnected from the server");
+  connectionManager.removeUser(msg.id);
+});
+
 socket.on("globalPositionUpdateMsg", (msg) => {
   if (msg.id === loginMsg.username) {
     console.log("update message id is same");

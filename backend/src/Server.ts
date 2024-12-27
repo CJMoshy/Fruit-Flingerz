@@ -18,7 +18,7 @@ const io = new Server<
 }); //* pass in custom url possible..
 
 const users: ConnectedUser[] = [];
-const globalUsersList: User[] = [];
+const spritesList: User[] = [];
 
 /**
  * @param msgName the name/type of message to send
@@ -55,12 +55,12 @@ io.on("connection", (socket) => {
       };
 
       // add it to server list
-      globalUsersList.push(newUserToken);
-      console.log(globalUsersList);
+      spritesList.push(newUserToken);
+      console.log(spritesList);
       // send a message back to the specific user
       socket.emit("loginResponseMsg", {
         status: 200,
-        users: globalUsersList,
+        users: spritesList,
       } as LoginResponseMessage);
 
       // notify all connected users about the new user
@@ -68,18 +68,48 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("disconnect", () => {
+    console.log("socket disconnected from server");
+    const userToDisconnectIndex = users.findIndex((user) =>
+      user.socket === socket
+    );
+    if (userToDisconnectIndex === -1) {
+      console.log(
+        "failed to find user in connected users arr with socket that just disconnected from server",
+      );
+      return;
+    }
+    const removedUser = users.splice(userToDisconnectIndex, 1);
+
+    console.log(removedUser[0].id, spritesList);
+    const spriteDataIndex = spritesList.findIndex((user) =>
+      user.user_id === removedUser[0].id
+    );
+
+    if (spriteDataIndex === -1) {
+      console.log(
+        "failed to find user in phaser sprite users arr that just disconnected from the server",
+      );
+      return;
+    }
+
+    spritesList.splice(spriteDataIndex, 1);
+
+    io.emit("userDisconnectMsg", { id: removedUser[0].id });
+  });
+
   socket.on("playerUpdateEvent", (msg) => {
-    const index = globalUsersList.findIndex((e) => e.user_id === msg.user_id);
+    const index = spritesList.findIndex((e) => e.user_id === msg.user_id);
     // globalUsersList[index] = msg; TEST THIS
-    globalUsersList[index].position.x = msg.position.x;
-    globalUsersList[index].position.y = msg.position.y;
-    globalUsersList[index].currentAnimation = msg.currentAnimation;
-    globalUsersList[index].currentTexture = msg.currentTexture;
-    globalUsersList[index].flipX = msg.flipX;
+    spritesList[index].position.x = msg.position.x;
+    spritesList[index].position.y = msg.position.y;
+    spritesList[index].currentAnimation = msg.currentAnimation;
+    spritesList[index].currentTexture = msg.currentTexture;
+    spritesList[index].flipX = msg.flipX;
 
     send_msg("globalPositionUpdateMsg", {
-      id: globalUsersList[index].user_id,
-      data: globalUsersList[index],
+      id: spritesList[index].user_id,
+      data: spritesList[index],
     } as GlobalPositionUpdateMsg);
   });
 });
