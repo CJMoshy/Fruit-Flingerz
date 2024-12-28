@@ -6,52 +6,28 @@
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-    >
-    <link rel="stylesheet" href="./src/style/style.css">
+    />
+    <link rel="stylesheet" href="./src/style/style.css" />
     <title>Multiplayer Game</title>
   </head>
   <body>
     <div id="phaser-game"></div>
     <div class="login-container">
-      <input type="text" id="username-field" placeholder="Username">
+      <input type="text" id="username-field" placeholder="Username" />
       <div class="password-container">
         <input
           type="password"
           id="password-field"
           placeholder="Password"
-        >
-        <button
-          id="show-password-btn"
-          onclick="togglePassword(true)"
-        >
-          𓂀
-        </button>
-      </div>
-      <div class="password-container">
+        />
         <input
           type="password"
           id="password-confirm-field"
           placeholder="Confirm Password"
-        >
-        <button
-          id="show-password-btn"
-          onclick="togglePassword(false)"
-        >
-          𓂀
-        </button>
+        />
       </div>
-
       <button id="login-btn">Login</button>
     </div>
-    <script>
-      function togglePassword(regular) {
-        let input;
-        regular
-          ? input = document.getElementById("password-field")
-          : input = document.getElementById("password-confirm-field");
-        input.type = input.type === "password" ? "text" : "password";
-      }
-    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

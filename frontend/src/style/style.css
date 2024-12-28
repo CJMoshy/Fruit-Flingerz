@@ -20,20 +20,3 @@
   display: inline-block;
 }
 
-.password-container input {
-  padding-right: 40px;
-}
-
-.password-container button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-  outline: none;
-}
-
-.password-container button:focus {
-  outline: none;
-}
