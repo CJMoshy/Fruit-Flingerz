@@ -2,10 +2,9 @@ import StateMachine from "../lib/StateMachine.ts";
 import { State } from "../lib/StateMachine.ts";
 import { socket } from "../lib/Socket.ts";
 import { loginMsg } from "../lib/Socket.ts";
+import Entity from "./Entity.ts";
 
-export default class Player extends Phaser.Physics.Arcade.Sprite {
-  user_name: string;
-  health: number;
+export default class Player extends Entity {
   keys: Phaser.Types.Input.Keyboard.CursorKeys;
   VELOCITY: number;
   JUMP_VELOCITY: number;
@@ -13,31 +12,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   jumpCount: number;
   FSM: StateMachine;
 
-  charModel: CharacterModel;
-
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
-    texture: string,
+    texture: CharacterModel,
     frame: number,
-    _name: string = "player",
-    _hitPoints: number = 10,
+    userName: string = "player",
+    hitPoints: number = 10,
   ) {
-    super(scene, x, y, texture, frame);
-
-    //phaser configs
-    scene.add.existing(this);
-    scene.physics.add.existing(this);
-    this.setCollideWorldBounds(true);
-    this.setGravityY(500);
-
-    //game things
-    this.charModel = texture as CharacterModel; // this is a shitty way of doing it but it works
-
-    //base player info
-    this.user_name = _name;
-    this.health = _hitPoints;
+    super(scene, x, y, texture, frame, userName, hitPoints);
 
     //movement logic
     this.VELOCITY = 200; //player speed
@@ -91,11 +75,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   determineTexture() {
     if (!this.anims.isPlaying) {
       if (this.body?.velocity.y !== undefined && this.body.velocity.y < 0) {
-        this.setTexture(`${this.charModel}-jump`);
+        this.setTexture(`${this.characterSprite}-jump`);
       } else if (
         this.body?.velocity.y !== undefined && this.body.velocity.y > 0
       ) {
-        this.setTexture(`${this.charModel}-fall`);
+        this.setTexture(`${this.characterSprite}-fall`);
       }
     }
   }
@@ -109,7 +93,7 @@ class idleState extends State {
 
   override execute(scene: Phaser.Scene, player: Player) {
     if (player.body?.velocity.y === 0 && !player.anims.isPlaying) {
-      player.anims.play(`${player.charModel}-idle`);
+      player.anims.play(`${player["characterSprite"]}-idle`);
     } else player.determineTexture();
     if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
       if (this.stateMachine !== undefined && player.isJumping === false) {
@@ -134,7 +118,7 @@ class moveState extends State {
   override enter(scene: Phaser.Scene, player: Player) {
     console.log("in move player State");
     player.anims.stop();
-    player.anims.play(`${player.charModel}-run`);
+    player.anims.play(`${player["characterSprite"]}-run`);
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
@@ -163,7 +147,7 @@ class jumpState extends State {
     player.setVelocityY(player.JUMP_VELOCITY);
 
     if (player.jumpCount === 2) {
-      player.anims.play(`${player.charModel}-dbJmp`);
+      player.anims.play(`${player["characterSprite"]}-dbJmp`);
       player.isJumping = true;
     }
 
