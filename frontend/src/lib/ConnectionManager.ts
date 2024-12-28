@@ -22,14 +22,16 @@ export default class ConnectionManager {
 
   // this can prob be redone more elegantly
   removeUser(id: UserID): void {
-    if (this.connectedPlayers.has(id) === false) {
+    if (this.connectedPlayers.delete(id) === false) {
       console.log(
         "attemping to remove user that was not in the connected users list",
       );
       return;
     }
-    this.connectedPlayers.delete(id);
-    console.log("deleted player", id);
+
+    this.CONNECTED_PLAYER_COUNT -= 1;
+    console.log(`removed player ${id} from connected users list`);
+
     const spriteToRemoveIndex = this.spritePool.findIndex((sprite) =>
       sprite.user_id === id
     );
@@ -42,6 +44,26 @@ export default class ConnectionManager {
     const sprite = this.spritePool.splice(spriteToRemoveIndex, 1);
     this.CURRENT_SPRITE_COUNT -= 1;
     sprite[0].entity.destroy();
+  }
+
+  createUsers(scene: Phaser.Scene): void {
+    for (const player of this.connectedPlayers) {
+      const spr = scene.physics.add.sprite(
+        100,
+        100,
+        player[1].currentTexture!,
+        0,
+      );
+      this.spritePool.push({ user_id: player[0], entity: spr });
+      this.CURRENT_SPRITE_COUNT += 1;
+    }
+  }
+
+  // check user in map and update TODO this might have bricked shit
+  updateUser(id: UserID, _data: User): void {
+    if (this.connectedPlayers.has(id)) {
+      this.connectedPlayers.set(id, _data);
+    }
   }
 
   updateSpritePool(scene: Phaser.Scene) {
@@ -58,23 +80,6 @@ export default class ConnectionManager {
       this.spritePool.push({ user_id: player[0], entity: spr });
       this.CURRENT_SPRITE_COUNT += 1;
     }
-  }
-
-  createUsers(scene: Phaser.Scene): void {
-    for (const player of this.connectedPlayers) {
-      const spr = scene.physics.add.sprite(
-        100,
-        100,
-        player[1].currentTexture!,
-        0,
-      );
-      this.spritePool.push({ user_id: player[0], entity: spr });
-      this.CURRENT_SPRITE_COUNT += 1;
-    }
-  }
-
-  updateUser(id: UserID, _data: User): void {
-    this.connectedPlayers.set(id, _data);
   }
 
   checkForNewUsers(): boolean {
