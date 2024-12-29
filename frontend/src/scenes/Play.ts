@@ -15,6 +15,7 @@ export default class Play extends Phaser.Scene {
   init(data: { char: CharacterModel }): void {
     this.selectedCharModel = data.char;
   }
+
   preload(): void {}
 
   create(): void {
@@ -59,9 +60,8 @@ export default class Play extends Phaser.Scene {
   }
 
   update(): void {
-    (this.playScreen as Phaser.GameObjects.TileSprite).tilePositionY += 1;
+    this.playScreen.tilePositionY += 1;
     if (connectionManager.checkForNewUsers()) {
-      console.log("new user");
       connectionManager.updateSpritePool(this);
     }
     this.player?.update();

@@ -29,22 +29,20 @@ export const loggedin: boolean = false;
 export const connectionManager = new ConnectionManager();
 
 document.addEventListener("DOMContentLoaded", () => {
-  // new Phaser.Game(CONFIG);
-  const usernameField = document.getElementById(
-    "username-field",
-  ) as HTMLInputElement;
-  usernameField.addEventListener("change", () => {
-    loginMsg.username = usernameField.value;
-  });
-  // let passwordField = document.getElementById('password-field') as HTMLInputElement
-  document.getElementById("login-btn")!.addEventListener("click", () => {
-    console.log("click");
-    if (loginMsg.username !== "") {
-      logUserIn(loginMsg);
-    } else {
-      console.log("no username or password");
-    }
-  });
+  new Phaser.Game(CONFIG);
+  // const usernameField = document.getElementById(
+  //   "username-field",
+  // ) as HTMLInputElement;
+  // usernameField.addEventListener("change", () => {
+  //   loginMsg.username = usernameField.value;
+  // });
+  // document.getElementById("login-btn")!.addEventListener("click", () => {
+  //   if (loginMsg.username !== "") {
+  //     logUserIn(loginMsg);
+  //   } else {
+  //     console.log("no username or password");
+  //   }
+  // });
 });
 
 document.addEventListener("connectionSuccess", () => new Phaser.Game(CONFIG));

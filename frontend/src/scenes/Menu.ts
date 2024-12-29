@@ -1,42 +1,44 @@
 export default class Menu extends Phaser.Scene {
-  private LEVELPADDING: number;
   private scrollingScreen!: Phaser.GameObjects.TileSprite;
-  private texturesMapping: Array<[BackgroundColor, CharacterModel]>;
-  private characterImage!: Phaser.GameObjects.Sprite;
-  private characterTextureCount: number;
-  private selectButton!: Phaser.GameObjects.Image;
 
+  private characterImage!: Phaser.GameObjects.Sprite;
+  private texturesMapping: Array<[BackgroundColor, CharacterModel]>;
+  private characterTextureCount: number;
   private isLockedIn: Boolean;
 
   private playBtn!: Phaser.GameObjects.Image;
+  private selectButton!: Phaser.GameObjects.Image;
+
+  private LEVELPADDING: number = 100;
+  private PLAYER_RESOLUTION_SCALE_FACTOR: number = 3;
 
   constructor() {
     super({ key: "menuScene" });
-
-    this.LEVELPADDING = 100;
+    // this is used to map each sprite texture to a background
     this.texturesMapping = new Array(
       ["BG-pink", "player01"],
       ["BG-blue", "player02"],
       ["BG-green", "player03"],
       ["BG-gray", "player04"],
     );
-    this.characterTextureCount = 0;
-    this.isLockedIn = false;
+    this.characterTextureCount = 0; // track where we are in the mapping
+    this.isLockedIn = false; // is the player locked in (ready to advance to play scene)
   }
 
   init(): void {}
 
-  preload(): void {
-  }
+  preload(): void {}
 
   create(): void {
+    // snag first index of mapping
     let selectedMapping = this.texturesMapping[this.characterTextureCount];
+    //verify the texture was loaded and set it
     if (this.textures.exists(selectedMapping[0])) {
       this.scrollingScreen = this.add.tileSprite(
         0,
         0,
-        800,
-        640,
+        this.sys.canvas.width,
+        this.sys.canvas.height,
         selectedMapping[0],
       )
         .setOrigin(0);
@@ -49,27 +51,38 @@ export default class Menu extends Phaser.Scene {
       0,
     ).setAlpha(0);
 
+    // sprite images on screen
     this.characterImage = this.add.sprite(
       this.game.config.width as number / 2,
       this.game.config.height as number / 2,
       `${selectedMapping[1]}-idle`,
-    ).setScale(3);
+    ).setScale(this.PLAYER_RESOLUTION_SCALE_FACTOR); // (upscaled in size)
     this.characterImage.anims.play(`${selectedMapping[1]}-idle`);
 
+    // helper for seeking through list of sprites
     const seekCharacter = (forward: boolean) => {
-      if (
-        forward && this.characterTextureCount < this.texturesMapping.length - 1
-      ) {
-        selectedMapping = this.texturesMapping[++this.characterTextureCount];
+      const setTextureAndPlayAnim = () => {
+        selectedMapping = this.texturesMapping[this.characterTextureCount];
         this.characterImage.setTexture(`${selectedMapping[1]}-idle`);
         this.characterImage.anims.play(`${selectedMapping[1]}-idle`);
         this.scrollingScreen.setTexture(`${selectedMapping[0]}`);
-      } else if (!forward && this.characterTextureCount > 0) {
-        selectedMapping = this.texturesMapping[--this.characterTextureCount];
-        this.characterImage.setTexture(`${selectedMapping[1]}-idle`);
-        this.characterImage.anims.play(`${selectedMapping[1]}-idle`);
-        this.scrollingScreen.setTexture(`${selectedMapping[0]}`);
+      };
+      if (forward) {
+        // at length of arr so reset to 0th index
+        if (this.characterTextureCount === this.texturesMapping.length - 1) {
+          this.characterTextureCount = 0;
+        } else {
+          this.characterTextureCount++;
+        }
+      } else {
+        // at 0th so set to length
+        if (this.characterTextureCount === 0) {
+          this.characterTextureCount = this.texturesMapping.length - 1;
+        } else {
+          this.characterTextureCount--;
+        }
       }
+      setTextureAndPlayAnim();
     };
 
     this.add.image(
@@ -80,6 +93,7 @@ export default class Menu extends Phaser.Scene {
       if (this.isLockedIn) return;
       seekCharacter(true);
     });
+
     this.add.image(
       this.sys.canvas.width / 2 - 150,
       this.sys.canvas.height / 2 + 250,
@@ -103,11 +117,10 @@ export default class Menu extends Phaser.Scene {
       if (this.isLockedIn) return;
       this.selectButton.setTexture("selectNoHover");
     }).on("pointerdown", () => {
-      if (!this.isLockedIn) {
+      if (this.isLockedIn === false) {
         this.isLockedIn = true;
         this.selectButton.setTexture("selectLocked");
         this.playBtn.setAlpha(1).setInteractive().on("pointerdown", () => {
-          // console.log("Game would start but the code is commented out");
           this.scene.start("playScene", { char: selectedMapping[1] });
         });
       } else {
@@ -119,6 +132,6 @@ export default class Menu extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
-    (this.scrollingScreen as Phaser.GameObjects.TileSprite).tilePositionY += 1;
+    this.scrollingScreen.tilePositionY += 1;
   }
 }
