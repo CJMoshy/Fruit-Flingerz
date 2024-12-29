@@ -34,7 +34,8 @@ export default class Player extends Entity {
       "up": Phaser.Input.Keyboard.KeyCodes.W,
     }) as Phaser.Types.Input.Keyboard.CursorKeys;
 
-    this.FSM = new StateMachine("idle", {
+    this.FSM = new StateMachine("spawn", {
+      spawn: new spawnState(),
       idle: new idleState(),
       move: new moveState(),
       jump: new jumpState(),
@@ -85,6 +86,20 @@ export default class Player extends Entity {
   }
 }
 
+//spawn state
+
+class spawnState extends State {
+  override enter(scene: Phaser.Scene, player: Player): void {
+    console.log(player);
+    player.playAppearAnim();
+  }
+
+  override execute(scene: Phaser.Scene, player: Player): void {
+    if (!player.anims.isPlaying) {
+      this.stateMachine.transition("idle");
+    }
+  }
+}
 //idle state
 class idleState extends State {
   override enter() {

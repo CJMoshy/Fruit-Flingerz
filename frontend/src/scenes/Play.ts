@@ -4,7 +4,7 @@ import { connectionManager } from "../main.ts";
 export default class Play extends Phaser.Scene {
   private player!: Player;
   private playScreen!: Phaser.GameObjects.TileSprite;
-  private selectedCharModel: string;
+  private selectedCharModel: CharacterModel;
 
   constructor() {
     super({ key: "playScene" });

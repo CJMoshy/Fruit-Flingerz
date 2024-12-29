@@ -35,6 +35,9 @@ import selectNoHover from "../assets/img/buttons/select/select_no_hover.png";
 import selectHover from "../assets/img/buttons/select/select_hover.png";
 import selectLocked from "../assets/img/buttons/select/select_locked.png";
 
+import Appearing from "../assets/spritesheets/spawn/Appearing.png";
+import Disappearing from "../assets/spritesheets/spawn/Disappearing.png";
+
 export default class Loader extends Phaser.Scene {
   constructor() {
     super({ key: "loaderScene" });
@@ -68,6 +71,16 @@ export default class Loader extends Phaser.Scene {
     this.load.image("player03-fall", player3Fall);
     this.load.image("player04-jump", player4Jmp);
     this.load.image("player04-fall", player4Fall);
+
+    //appearing and disappearing animation
+    this.load.spritesheet("appear", Appearing, {
+      frameWidth: 96,
+      frameHeight: 96,
+    });
+    this.load.spritesheet("disappear", Disappearing, {
+      frameWidth: 96,
+      frameHeight: 96,
+    });
 
     //player spritesheets
     //p1
@@ -132,6 +145,22 @@ export default class Loader extends Phaser.Scene {
   }
 
   create(): void {
+    this.anims.create({
+      key: "appearing-anim",
+      frames: this.anims.generateFrameNumbers("appear", {
+        start: 0,
+        end: 6,
+      }),
+    });
+
+    this.anims.create({
+      key: "disappearing-anim",
+      frames: this.anims.generateFrameNumbers("disappear", {
+        start: 0,
+        end: 6,
+      }),
+    });
+
     this.anims.create({
       key: "player01-idle",
       frames: this.anims.generateFrameNumbers("player-01-idle", {
