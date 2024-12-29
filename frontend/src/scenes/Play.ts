@@ -20,8 +20,8 @@ export default class Play extends Phaser.Scene {
 
   create(): void {
     //load backgorund
-    if (this.textures.exists("BG-pink")) {
-      this.playScreen = this.add.tileSprite(0, 0, 800, 640, "BG-pink")
+    if (this.textures.exists("BG-purple")) {
+      this.playScreen = this.add.tileSprite(0, 0, 800, 640, "BG-purple")
         .setOrigin(0);
     }
 

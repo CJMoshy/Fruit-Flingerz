@@ -45,17 +45,12 @@ export default class ConnectionManager {
     }
     const sprite = this.spritePool.splice(spriteToRemoveIndex, 1);
     this.CURRENT_SPRITE_COUNT -= 1;
-    sprite[0].entity.destroy();
+
+    sprite[0].entity.removeFromScene();
   }
 
   createUsers(scene: Phaser.Scene): void {
     for (const player of this.connectedPlayers) {
-      // const spr = scene.physics.add.sprite(
-      //   100,
-      //   100,
-      //   player[1].currentTexture!,
-      //   0,
-      // );
       const opp = new Opponent(
         scene,
         100,
@@ -93,10 +88,7 @@ export default class ConnectionManager {
   }
 
   checkForNewUsers(): boolean {
-    if (this.CONNECTED_PLAYER_COUNT > this.CURRENT_SPRITE_COUNT) {
-      return true;
-    }
-    return false;
+    return this.CONNECTED_PLAYER_COUNT > this.CURRENT_SPRITE_COUNT;
   }
 
   updateSpritePoolGameState(): void {

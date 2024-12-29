@@ -10,4 +10,11 @@ export default class Opponent extends Entity {
   ) {
     super(scene, x, y, texture, frame, "any", 0);
   }
+
+  public removeFromScene() {
+    this.anims.play("disappearing-anim").on(
+      "animationcomplete",
+      () => this.destroy(),
+    );
+  }
 }
