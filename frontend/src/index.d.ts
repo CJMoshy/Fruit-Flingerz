@@ -13,7 +13,7 @@ interface User {
 
 interface OtherSprites {
   user_id: UserID;
-  entity: Phaser.Physics.Arcade.Sprite;
+  entity: OpponentType;
 }
 
 interface Message {

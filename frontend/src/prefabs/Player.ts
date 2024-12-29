@@ -23,6 +23,8 @@ export default class Player extends Entity {
   ) {
     super(scene, x, y, texture, frame, userName, hitPoints);
 
+    this.setGravityY(500);
+
     //movement logic
     this.VELOCITY = 200; //player speed
     this.JUMP_VELOCITY = -300; //jump speed
@@ -91,7 +93,7 @@ export default class Player extends Entity {
 class spawnState extends State {
   override enter(scene: Phaser.Scene, player: Player): void {
     console.log(player);
-    player.playAppearAnim();
+    player.anims.play("appearing-anim");
   }
 
   override execute(scene: Phaser.Scene, player: Player): void {

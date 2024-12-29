@@ -1,3 +1,5 @@
+import Opponent from "../prefabs/Opponent";
+
 export default class ConnectionManager {
   public CONNECTED_PLAYER_COUNT: number;
   private connectedPlayers: Map<UserID, User>;
@@ -48,13 +50,20 @@ export default class ConnectionManager {
 
   createUsers(scene: Phaser.Scene): void {
     for (const player of this.connectedPlayers) {
-      const spr = scene.physics.add.sprite(
+      // const spr = scene.physics.add.sprite(
+      //   100,
+      //   100,
+      //   player[1].currentTexture!,
+      //   0,
+      // );
+      const opp = new Opponent(
+        scene,
         100,
         100,
-        player[1].currentTexture!,
+        player[1].currentTexture! as CharacterModel,
         0,
       );
-      this.spritePool.push({ user_id: player[0], entity: spr });
+      this.spritePool.push({ user_id: player[0], entity: opp });
       this.CURRENT_SPRITE_COUNT += 1;
     }
   }
@@ -71,13 +80,14 @@ export default class ConnectionManager {
       if (this.spritePool.find((e) => e.user_id === player[0])) {
         continue;
       }
-      const spr = scene.physics.add.sprite(
+      const opp = new Opponent(
+        scene,
         100,
         100,
-        player[1].currentTexture!,
+        player[1].currentTexture! as CharacterModel,
         0,
       );
-      this.spritePool.push({ user_id: player[0], entity: spr });
+      this.spritePool.push({ user_id: player[0], entity: opp });
       this.CURRENT_SPRITE_COUNT += 1;
     }
   }

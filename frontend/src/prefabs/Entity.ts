@@ -19,7 +19,6 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.setCollideWorldBounds(true);
-    this.setGravityY(500);
 
     //game things
     this.characterSprite = texture;
@@ -27,13 +26,5 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     //base player info
     this.userName = userName;
     this.hitPoints = hitPoints;
-  }
-
-  public playAppearAnim() {
-    this.anims.play("appearing-anim");
-  }
-
-  public playDisappearAnim() {
-    this.anims.play("disappearing-anim");
   }
 }
