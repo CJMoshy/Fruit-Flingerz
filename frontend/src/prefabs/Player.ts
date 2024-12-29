@@ -45,6 +45,7 @@ export default class Player extends Entity {
   }
 
   override update(): void {
+    // this is the next problem. Emitting an event/ping to the server every update tick just seems nasty
     socket.emit("playerUpdateEvent", {
       user_id: loginMsg.username,
       position: {
@@ -55,7 +56,7 @@ export default class Player extends Entity {
       currentTexture: this.texture.key,
       flipX: this.flipX,
     });
-
+    // end problem
     this.FSM.step();
     this.determineTexture();
   }
