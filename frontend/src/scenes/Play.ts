@@ -1,5 +1,6 @@
 import Player from "../prefabs/Player.ts";
 import { connectionManager } from "../main.ts";
+import { loginMsg } from "../lib/Socket.ts";
 
 export default class Play extends Phaser.Scene {
   private player!: Player;
@@ -10,6 +11,15 @@ export default class Play extends Phaser.Scene {
     super({ key: "playScene" });
 
     this.selectedCharModel = "player01"; // default to player1 if for some reason things went bad and they got to this scene without selecting a charater
+    document.addEventListener(
+      "userJoinedGame",
+      ((e: CustomEvent) => {
+        if (this.scene.isActive("playScene")) {
+          console.log(e.detail);
+          connectionManager.addUserToSpritePool(this, e.detail);
+        }
+      }) as EventListener,
+    );
   }
 
   init(data: { char: CharacterModel }): void {
@@ -25,8 +35,10 @@ export default class Play extends Phaser.Scene {
         .setOrigin(0);
     }
 
+    // load existing users
     connectionManager.createUsers(this);
 
+    //create map
     const map = this.add.tilemap("tilemapJSON");
     const tileset = map.addTilesetImage(
       "Terrain",
@@ -38,16 +50,18 @@ export default class Play extends Phaser.Scene {
     ) as Phaser.Tilemaps.TilemapLayer;
     collisionLayer.setCollisionByProperty({ collides: true });
 
+    //spawn player
     this.player = new Player(
       this,
       100,
       100,
       this.selectedCharModel,
       0,
-      undefined,
+      loginMsg.username,
       2,
     );
 
+    //define collision logic for player and map
     this.physics.add.collider(this.player, collisionLayer, () => {
       if (this.player !== null) {
         this.player.setVelocity(0);
@@ -57,14 +71,22 @@ export default class Play extends Phaser.Scene {
         }
       }
     });
+
+    // button to return to the menu
+    this.add.image(100, 100, "levelBtn").setInteractive().on(
+      "pointerdown",
+      () => {
+        connectionManager.clearAllUsersFromSpritePool();
+        this.player.exitScene();
+      },
+    );
   }
 
   update(): void {
     this.playScreen.tilePositionY += 1;
-    if (connectionManager.checkForNewUsers()) {
-      connectionManager.updateSpritePool(this);
+    if (this.player.active) {
+      this.player.update();
     }
-    this.player?.update();
     connectionManager.updateSpritePoolGameState();
   }
 }

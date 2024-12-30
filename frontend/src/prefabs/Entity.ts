@@ -11,7 +11,7 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     y: number,
     texture: CharacterModel,
     frame: number = 0,
-    userName: string,
+    userName: UserID,
     hitPoints: number,
   ) {
     super(scene, x, y, texture, frame);
@@ -26,5 +26,18 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     //base player info
     this.userName = userName;
     this.hitPoints = hitPoints;
+  }
+
+  public removeFromScene(): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.anims.play("disappearing-anim").on(
+        "animationcomplete",
+        () => {
+          this.destroy();
+          console.log("destroyed", this);
+          resolve(true);
+        },
+      );
+    });
   }
 }

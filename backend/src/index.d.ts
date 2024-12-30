@@ -37,20 +37,28 @@ interface UserDCMessage extends Message {
   id: UserID;
 }
 
+interface UserJoinedGameMsg extends Message {
+  id: UserID;
+  texture: string;
+}
+
 interface GlobalPositionUpdateMsg extends Message {
   id: UserID;
   data: User; // FIX THIS MAKE DATA TYPE AND PASS THAT
 }
 
 interface ServerToClientEvents {
-  hello: () => void;
   newUserMsg: (msg: NewUserMessage) => void;
   globalPositionUpdateMsg: (msg: GlobalPositionUpdateMsg) => void;
   loginResponseMsg: (msg: Message | LoginResponseMessage) => void;
   userDisconnectMsg: (msg: UserDCMessage) => void;
+  userLeftGameMsg: (msg: UserDCMessage) => void;
+  userJoinedGameMsg: (msg: UserJoinedGameMsg) => void;
 }
 
 interface ClientToServerEvents {
   loginMsg: (msg: loginMsg) => void;
   playerUpdateEvent: (msg: User) => void;
+  playerLeftGameEvent: (msg: UserDCMessage) => void;
+  playerJoinedGameEvent: (msg: UserJoinedGameMsg) => void;
 }

@@ -11,6 +11,7 @@ export default class Player extends Entity {
   isJumping: boolean;
   jumpCount: number;
   FSM: StateMachine;
+  parentScene: Phaser.Scene;
 
   constructor(
     scene: Phaser.Scene,
@@ -22,6 +23,8 @@ export default class Player extends Entity {
     hitPoints: number = 10,
   ) {
     super(scene, x, y, texture, frame, userName, hitPoints);
+
+    this.parentScene = scene;
 
     this.setGravityY(500);
 
@@ -42,6 +45,23 @@ export default class Player extends Entity {
       move: new moveState(),
       jump: new jumpState(),
     }, [scene, this]);
+
+    this.joinScene(`${texture}-idle`);
+  }
+
+  joinScene(texture: string) {
+    socket.emit("playerJoinedGameEvent", {
+      id: this.userName,
+      texture: texture,
+    });
+  }
+
+  async exitScene() {
+    const pr = await super.removeFromScene();
+    if (pr.valueOf() === true) {
+      socket.emit("playerLeftGameEvent", { id: this.userName });
+      this.parentScene.scene.start("menuScene");
+    }
   }
 
   override update(): void {
@@ -93,7 +113,6 @@ export default class Player extends Entity {
 
 class spawnState extends State {
   override enter(scene: Phaser.Scene, player: Player): void {
-    console.log(player);
     player.anims.play("appearing-anim");
   }
 
@@ -103,10 +122,11 @@ class spawnState extends State {
     }
   }
 }
+
 //idle state
 class idleState extends State {
   override enter() {
-    console.log("in idle player state");
+    // console.log("in idle player state");
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
@@ -134,7 +154,7 @@ class idleState extends State {
 //moving state
 class moveState extends State {
   override enter(scene: Phaser.Scene, player: Player) {
-    console.log("in move player State");
+    // console.log("in move player State");
     player.anims.stop();
     player.anims.play(`${player["characterSprite"]}-run`);
   }
@@ -161,7 +181,7 @@ class moveState extends State {
 class jumpState extends State {
   override enter(scene: Phaser.Scene, player: Player) {
     player.jumpCount += 1;
-    console.log("in jump player State", player.jumpCount);
+    // console.log("in jump player State", player.jumpCount);
     player.setVelocityY(player.JUMP_VELOCITY);
 
     if (player.jumpCount === 2) {

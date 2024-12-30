@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
 
       // add it to server list
       spritesList.push(newUserToken);
-      console.log(spritesList);
+
       // send a message back to the specific user
       socket.emit("loginResponseMsg", {
         status: 200,
@@ -106,6 +106,17 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("globalPositionUpdateMsg", {
       id: spritesList[index].user_id,
       data: spritesList[index],
+    });
+  });
+
+  socket.on("playerLeftGameEvent", (msg) => {
+    socket.broadcast.emit("userLeftGameMsg", { id: msg.id });
+  });
+
+  socket.on("playerJoinedGameEvent", (msg) => {
+    socket.broadcast.emit("userJoinedGameMsg", {
+      id: msg.id,
+      texture: msg.texture,
     });
   });
 });

@@ -18,7 +18,7 @@ socket.on("connect", () => {
 
 socket.on("connect_error", (err) => {
   console.error("error connecting", err);
-  alert("World Server Down!");
+  alert("World Server Down! Refresh page to initiate new connection to server");
   socket.disconnect();
 });
 
@@ -54,7 +54,17 @@ socket.on("globalPositionUpdateMsg", (msg) => {
     console.log("update message id is same");
     return;
   }
-  connectionManager.updateUser(msg.id, msg.data);
+  connectionManager.updateUser(msg.id, msg.data, false);
+});
+
+socket.on("userJoinedGameMsg", (msg) => {
+  connectionManager.updateUser(msg.id, msg.texture, true);
+  document.dispatchEvent(new CustomEvent("userJoinedGame", { detail: msg.id }));
+});
+
+socket.on("userLeftGameMsg", (msg) => {
+  console.log(`user ${msg.id} left the game!`);
+  connectionManager.removeUserFromSpritePool(msg.id);
 });
 
 export function logUserIn(loginMsg: LoginMessage) {
