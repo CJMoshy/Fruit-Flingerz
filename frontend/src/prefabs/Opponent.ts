@@ -7,7 +7,13 @@ export default class Opponent extends Entity {
     y: number,
     texture: CharacterModel,
     frame: number,
+    name?: string,
   ) {
-    super(scene, x, y, texture, frame, "any", 0);
+    super(scene, x, y, texture, frame, name ? name : "any", 0);
+    scene.events.on("update", this.update, this);
+  }
+
+  update(...args: any[]): void {
+    super.update();
   }
 }

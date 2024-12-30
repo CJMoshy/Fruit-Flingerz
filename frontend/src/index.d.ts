@@ -48,7 +48,6 @@ interface GlobalPositionUpdateMsg extends Message {
 }
 
 interface ServerToClientEvents {
-  hello: () => void;
   newUserMsg: (msg: NewUserMessage) => void;
   globalPositionUpdateMsg: (msg: GlobalPositionUpdateMsg) => void;
   loginResponseMsg: (msg: LoginResponseMessage) => void;

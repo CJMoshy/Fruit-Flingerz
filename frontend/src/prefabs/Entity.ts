@@ -5,6 +5,8 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
 
   protected hitPoints: number;
 
+  private namePlate: Phaser.GameObjects.Text;
+
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -26,6 +28,18 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     //base player info
     this.userName = userName;
     this.hitPoints = hitPoints;
+
+    this.namePlate = scene.add.text(this.x, this.y - 20, this.userName)
+      .setOrigin(0.5);
+  }
+
+  update(...args: any[]): void {
+    this.updateNamePlate();
+  }
+
+  private updateNamePlate() {
+    this.namePlate.x = this.x;
+    this.namePlate.y = this.y - 30;
   }
 
   public removeFromScene(): Promise<boolean> {

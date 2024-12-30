@@ -40,6 +40,7 @@ export default class ConnectionManager {
         100,
         player[1].currentTexture! as CharacterModel,
         0,
+        player[1].user_id,
       );
       this.spritePool.push({ user_id: player[0], entity: opp });
     }
@@ -101,6 +102,7 @@ export default class ConnectionManager {
       100,
       data!.currentTexture as CharacterModel,
       0,
+      data!.user_id,
     );
     this.spritePool.push({ user_id: id, entity: opp });
   }

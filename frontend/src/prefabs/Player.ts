@@ -65,6 +65,7 @@ export default class Player extends Entity {
   }
 
   override update(): void {
+    super.update();
     // this is the next problem. Emitting an event/ping to the server every update tick just seems nasty
     socket.emit("playerUpdateEvent", {
       user_id: loginMsg.username,
