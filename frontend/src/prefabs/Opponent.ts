@@ -5,11 +5,12 @@ export default class Opponent extends Entity {
     scene: Phaser.Scene,
     x: number,
     y: number,
-    texture: CharacterModel,
+    texture: string = "appearing-anim",
     frame: number,
+    charSprite: CharacterModel,
     name?: string,
   ) {
-    super(scene, x, y, texture, frame, name ? name : "any", 0);
+    super(scene, x, y, texture, frame, charSprite, name ? name : "any", 0);
     scene.events.on("update", this.update, this);
   }
 

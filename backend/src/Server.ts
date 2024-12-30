@@ -96,6 +96,7 @@ io.on("connection", (socket) => {
 
   socket.on("playerUpdateEvent", (msg) => {
     const index = spritesList.findIndex((e) => e.user_id === msg.user_id);
+    if (index === -1) return;
     // globalUsersList[index] = msg; TEST THIS
     spritesList[index].position.x = msg.position.x;
     spritesList[index].position.y = msg.position.y;

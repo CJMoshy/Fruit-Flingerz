@@ -5,14 +5,15 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
 
   protected hitPoints: number;
 
-  private namePlate: Phaser.GameObjects.Text;
+  protected namePlate: Phaser.GameObjects.Text;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
-    texture: CharacterModel,
+    texture: string = "appearing-anim",
     frame: number = 0,
+    charSprite: CharacterModel,
     userName: UserID,
     hitPoints: number,
   ) {
@@ -23,7 +24,7 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true);
 
     //game things
-    this.characterSprite = texture;
+    this.characterSprite = charSprite;
 
     //base player info
     this.userName = userName;
@@ -37,21 +38,17 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     this.updateNamePlate();
   }
 
+  public removeNamePlate() {
+    this.namePlate.destroy();
+  }
   private updateNamePlate() {
     this.namePlate.x = this.x;
     this.namePlate.y = this.y - 30;
   }
 
-  public removeFromScene(): Promise<boolean> {
-    return new Promise((resolve) => {
-      this.anims.play("disappearing-anim").on(
-        "animationcomplete",
-        () => {
-          this.destroy();
-          console.log("destroyed", this);
-          resolve(true);
-        },
-      );
-    });
+  public removeFromScene() {
+    this.removeNamePlate();
+    this.destroy();
+    console.log("destroyed", this);
   }
 }

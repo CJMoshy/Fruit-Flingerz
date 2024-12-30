@@ -3,8 +3,8 @@ export default class Menu extends Phaser.Scene {
 
   private characterImage!: Phaser.GameObjects.Sprite;
   private texturesMapping: Array<[BackgroundColor, CharacterModel]>;
-  private characterTextureCount: number;
-  private isLockedIn: Boolean;
+  private characterTextureCount: number = 0;
+  private isLockedIn: Boolean = false;
 
   private playBtn!: Phaser.GameObjects.Image;
   private selectButton!: Phaser.GameObjects.Image;
@@ -21,8 +21,6 @@ export default class Menu extends Phaser.Scene {
       ["BG-green", "player03"],
       ["BG-gray", "player04"],
     );
-    this.characterTextureCount = 0; // track where we are in the mapping
-    this.isLockedIn = false; // is the player locked in (ready to advance to play scene)
   }
 
   init(): void {}
@@ -30,6 +28,9 @@ export default class Menu extends Phaser.Scene {
   preload(): void {}
 
   create(): void {
+    this.isLockedIn = false; // set in create so whenever the player returns here from game its reset
+    this.characterTextureCount = 0; // track where we are in the mapping (reset on return)
+
     // snag first index of mapping
     let selectedMapping = this.texturesMapping[this.characterTextureCount];
     //verify the texture was loaded and set it
@@ -121,6 +122,7 @@ export default class Menu extends Phaser.Scene {
         this.isLockedIn = true;
         this.selectButton.setTexture("selectLocked");
         this.playBtn.setAlpha(1).setInteractive().on("pointerdown", () => {
+          this.scene.stop("menuScene");
           this.scene.start("playScene", { char: selectedMapping[1] });
         });
       } else {

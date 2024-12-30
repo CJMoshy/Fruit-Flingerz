@@ -26,22 +26,22 @@ socket.on("loginResponseMsg", (msg) => {
   if (msg.status === 409) {
     alert("Error Logging In. A user with this name already exists");
     console.error("Error Logging In. A user with this name already exists");
+    return;
   }
   for (const user of msg.users) {
-    if (user.user_id! === loginMsg.username) continue;
-    connectionManager.addUser(user.user_id!, user);
+    if (user.user_id === loginMsg.username) continue;
+    connectionManager.addUser(user.user_id, user);
   }
   document.dispatchEvent(new Event("connectionSuccess"));
 });
 
 socket.on("newUserMsg", (msg) => {
   console.log("new user message", msg);
-  // maybe an issue here with the id being undef
   if (msg.user.user_id === loginMsg.username) {
     console.log("new user message id is same");
     return;
   }
-  connectionManager.addUser(msg.user.user_id!, msg.user);
+  connectionManager.addUser(msg.user.user_id, msg.user);
 });
 
 socket.on("userDisconnectMsg", (msg) => {
@@ -58,12 +58,14 @@ socket.on("globalPositionUpdateMsg", (msg) => {
 });
 
 socket.on("userJoinedGameMsg", (msg) => {
+  connectionManager.addPlayerInGame(msg.id);
   connectionManager.updateUser(msg.id, msg.texture, true);
   document.dispatchEvent(new CustomEvent("userJoinedGame", { detail: msg.id }));
 });
 
 socket.on("userLeftGameMsg", (msg) => {
   console.log(`user ${msg.id} left the game!`);
+  connectionManager.removePlayerInGame(msg.id);
   connectionManager.removeUserFromSpritePool(msg.id);
 });
 

@@ -5,12 +5,11 @@ import { loginMsg } from "../lib/Socket.ts";
 export default class Play extends Phaser.Scene {
   private player!: Player;
   private playScreen!: Phaser.GameObjects.TileSprite;
-  private selectedCharModel: CharacterModel;
+  private selectedCharModel: CharacterModel = "player01";
 
   constructor() {
     super({ key: "playScene" });
 
-    this.selectedCharModel = "player01"; // default to player1 if for some reason things went bad and they got to this scene without selecting a charater
     document.addEventListener(
       "userJoinedGame",
       ((e: CustomEvent) => {
@@ -23,7 +22,7 @@ export default class Play extends Phaser.Scene {
   }
 
   init(data: { char: CharacterModel }): void {
-    this.selectedCharModel = data.char;
+    this.selectedCharModel = data.char; // should overwrite line 8 on entry of scene
   }
 
   preload(): void {}
@@ -55,8 +54,9 @@ export default class Play extends Phaser.Scene {
       this,
       100,
       100,
-      this.selectedCharModel,
+      "appearing-anim",
       0,
+      this.selectedCharModel,
       loginMsg.username,
       2,
     );

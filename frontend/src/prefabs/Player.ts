@@ -17,12 +17,13 @@ export default class Player extends Entity {
     scene: Phaser.Scene,
     x: number,
     y: number,
-    texture: CharacterModel,
+    texture: string = "appearing-anim",
     frame: number,
+    charSprite: CharacterModel,
     userName: string = "player",
     hitPoints: number = 10,
   ) {
-    super(scene, x, y, texture, frame, userName, hitPoints);
+    super(scene, x, y, texture, frame, charSprite, userName, hitPoints);
 
     this.parentScene = scene;
 
@@ -46,22 +47,26 @@ export default class Player extends Entity {
       jump: new jumpState(),
     }, [scene, this]);
 
-    this.joinScene(`${texture}-idle`);
+    this.joinScene(texture);
   }
 
-  joinScene(texture: string) {
+  joinScene(texture: string = "appearing-anim") {
     socket.emit("playerJoinedGameEvent", {
       id: this.userName,
       texture: texture,
     });
   }
 
-  async exitScene() {
-    const pr = await super.removeFromScene();
-    if (pr.valueOf() === true) {
-      socket.emit("playerLeftGameEvent", { id: this.userName });
-      this.parentScene.scene.start("menuScene");
-    }
+  exitScene() {
+    this.anims.play("disappearing-anim").on(
+      "animationcomplete",
+      () => {
+        super.removeFromScene();
+        socket.emit("playerLeftGameEvent", { id: this.userName });
+        this.parentScene.scene.stop("playScene");
+        this.parentScene.scene.start("menuScene");
+      },
+    );
   }
 
   override update(): void {
@@ -73,7 +78,7 @@ export default class Player extends Entity {
         x: this.x,
         y: this.y,
       },
-      currentAnimation: this.anims.currentAnim?.toJSON().key,
+      currentAnimation: this.anims.currentAnim?.toJSON().key, // potential problem
       currentTexture: this.texture.key,
       flipX: this.flipX,
     });

@@ -2,10 +2,12 @@ import Opponent from "../prefabs/Opponent";
 
 export default class ConnectionManager {
   private connectedPlayers: Map<UserID, User>;
+  private playersInGame: Set<UserID>;
   private spritePool: Array<OtherSprites>;
 
   constructor() {
     this.connectedPlayers = new Map();
+    this.playersInGame = new Set();
     this.spritePool = new Array();
   }
 
@@ -14,6 +16,17 @@ export default class ConnectionManager {
     this.connectedPlayers.set(id, user);
   }
 
+  addPlayerInGame(id: UserID) {
+    this.playersInGame.add(id);
+  }
+
+  removePlayerInGame(id: UserID) {
+    this.playersInGame.delete(id);
+  }
+
+  hasPlayerInGame(id: UserID): boolean {
+    return this.playersInGame.has(id);
+  }
   // this can prob be redone more elegantly
   removeUser(id: UserID): void {
     if (this.connectedPlayers.delete(id) === false) {
@@ -30,16 +43,22 @@ export default class ConnectionManager {
   // another player joins game (playScene) this method will skip the iteration for that player (33-35)
   createUsers(scene: Phaser.Scene): void {
     for (const player of this.connectedPlayers) {
-      if (this.spritePool.find((e) => e.user_id === player[0])) {
-        console.log("character was already loaded into sprite pool");
+      if (
+        this.spritePool.find((e) => e.user_id === player[0]) ||
+        this.playersInGame.has(player[0]) === false
+      ) {
+        console.log(
+          "character was already loaded into sprite pool or is in lobby",
+        );
         continue;
       }
       const opp = new Opponent(
         scene,
         100,
         100,
-        player[1].currentTexture! as CharacterModel,
+        "appearing-anim",
         0,
+        player[1].currentTexture! as CharacterModel,
         player[1].user_id,
       );
       this.spritePool.push({ user_id: player[0], entity: opp });
@@ -68,6 +87,7 @@ export default class ConnectionManager {
 
   clearAllUsersFromSpritePool(): void {
     for (const spr of this.spritePool) {
+      spr.entity.removeNamePlate();
       spr.entity.destroy();
     }
     this.spritePool = new Array();
@@ -100,8 +120,9 @@ export default class ConnectionManager {
       scene,
       100,
       100,
-      data!.currentTexture as CharacterModel,
+      "appearing-anim",
       0,
+      data!.currentTexture as CharacterModel,
       data!.user_id,
     );
     this.spritePool.push({ user_id: id, entity: opp });
