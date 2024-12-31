@@ -29,6 +29,14 @@ interface LoginResponseMessage extends Message {
   users: User[];
 }
 
+interface CreateLobbyMessage extends Message {
+  lobbyName: string;
+}
+
+interface CreateLobbyResponseMsg extends Message {
+  created: boolean;
+}
+
 interface NewUserMessage extends Message {
   user: User;
 }
@@ -49,6 +57,7 @@ interface GlobalPositionUpdateMsg extends Message {
 
 interface ServerToClientEvents {
   newUserMsg: (msg: NewUserMessage) => void;
+  lobbyCreatedMsg: (msg: CreateLobbyResponseMsg) => void;
   globalPositionUpdateMsg: (msg: GlobalPositionUpdateMsg) => void;
   loginResponseMsg: (msg: LoginResponseMessage) => void;
   userDisconnectMsg: (msg: UserDCMessage) => void;
@@ -58,6 +67,7 @@ interface ServerToClientEvents {
 
 interface ClientToServerEvents {
   loginMsg: (msg: loginMsg) => void;
+  createLobbyEvent: (msg: CreateLobbyMessage) => void;
   playerUpdateEvent: (msg: User) => void;
   playerLeftGameEvent: (msg: UserDCMessage) => void;
   playerJoinedGameEvent: (msg: UserJoinedGameMsg) => void;
