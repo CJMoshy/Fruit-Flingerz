@@ -40,6 +40,7 @@ io.on("connection", (socket) => {
       users.push({ id: msg.username, socket: socket, lobby: "none" });
       const newUserToken: User = {
         user_id: msg.username,
+        inGame: false,
         position: {
           x: 0,
           y: 0,
@@ -97,6 +98,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("createLobbyEvent", (msg) => {
+    const user = users.find((user) => user.socket.id === socket.id);
+    if (!user) return;
+
     const response: CreateLobbyResponseMsg = {
       status: 201,
       created: true,
@@ -108,12 +112,44 @@ io.on("connection", (socket) => {
     } else {
       activeLobbies.add(msg.lobbyName);
       socket.join(msg.lobbyName);
-      const user = users.find((user) => user.socket.id === socket.id);
-      if (!user) return; // prob not needed
       user.lobby = msg.lobbyName;
     }
 
     socket.emit("lobbyCreatedMsg", response);
+  });
+
+  socket.on("joinLobbyEvent", (msg) => {
+    const user = users.find((user) => user.socket.id === socket.id);
+    if (!user) return;
+
+    const response: JoinLobbyResponseMessage = {
+      status: 200,
+      joined: true,
+      usersInGame: [],
+    };
+
+    if (activeLobbies.has(msg.lobbyName)) {
+      user.socket.join(msg.lobbyName);
+      user.lobby = msg.lobbyName;
+
+      // all the users in the current lobby
+      const usersInLobby = users.filter((user) => user.lobby === msg.lobbyName);
+
+      // get only the ids
+      const userIds: UserID[] = [];
+      usersInLobby.forEach((e) => userIds.push(e.id));
+
+      // only get sprites that are in the lobby AND in the game
+      // otherwise the join and leave events will do the work
+      response.usersInGame = spritesList.filter((spr) =>
+        userIds.includes(spr.user_id)
+      ).filter((spr) => spr.inGame === true);
+    } else {
+      response.status = 404;
+      response.joined = false;
+    }
+
+    socket.emit("lobbyJoinedMsg", response);
   });
 
   //sent by connected players to server containing game information
@@ -127,7 +163,12 @@ io.on("connection", (socket) => {
     spritesList[index].currentTexture = msg.currentTexture;
     spritesList[index].flipX = msg.flipX;
 
-    socket.broadcast.emit("globalPositionUpdateMsg", {
+    // can likely turn these three into function getUserRoom
+    const user = users.find((user) => user.socket.id === socket.id);
+    if (!user) return;
+    const { lobby } = user;
+
+    socket.to(lobby).emit("globalPositionUpdateMsg", {
       id: spritesList[index].user_id,
       data: spritesList[index],
     });
@@ -135,12 +176,30 @@ io.on("connection", (socket) => {
 
   // sent when a player returns to the menu
   socket.on("playerLeftGameEvent", (msg) => {
-    socket.broadcast.emit("userLeftGameMsg", { id: msg.id });
+    const user = users.find((user) => user.socket.id === socket.id);
+    if (!user) return;
+
+    // thats a function if ive ever seen one
+    const sprIndex = spritesList.findIndex((spr) => spr.user_id === user.id);
+    if (sprIndex === -1) return;
+    spritesList[sprIndex].inGame = false;
+
+    const { lobby } = user;
+    socket.to(lobby).emit("userLeftGameMsg", { id: msg.id });
   });
 
   // sent when a player joins back into the game (playScene)
   socket.on("playerJoinedGameEvent", (msg) => {
-    socket.broadcast.emit("userJoinedGameMsg", {
+    const user = users.find((user) => user.socket.id === socket.id);
+    if (!user) return;
+
+    //refactor to function
+    const sprIndex = spritesList.findIndex((spr) => spr.user_id === user.id);
+    if (sprIndex === -1) return;
+    spritesList[sprIndex].inGame = true;
+
+    const { lobby } = user;
+    socket.to(lobby).emit("userJoinedGameMsg", {
       id: msg.id,
       texture: msg.texture,
     });

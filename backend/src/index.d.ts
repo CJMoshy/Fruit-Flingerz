@@ -8,6 +8,7 @@ type UserID = string;
 
 interface User {
   user_id: UserID;
+  inGame: boolean;
   position: {
     x: number;
     y: number;
@@ -34,8 +35,17 @@ interface CreateLobbyMessage extends Message {
   lobbyName: string;
 }
 
+interface JoinLobbyMessage extends Message {
+  lobbyName: string;
+}
+
 interface CreateLobbyResponseMsg extends Message {
   created: boolean;
+}
+
+interface JoinLobbyResponseMessage extends Message {
+  joined: boolean;
+  usersInGame: User[];
 }
 
 interface NewUserMessage extends Message {
@@ -59,6 +69,7 @@ interface GlobalPositionUpdateMsg extends Message {
 interface ServerToClientEvents {
   newUserMsg: (msg: NewUserMessage) => void;
   lobbyCreatedMsg: (msg: CreateLobbyResponseMsg) => void;
+  lobbyJoinedMsg: (msg: JoinLobbyResponseMessage) => void;
   globalPositionUpdateMsg: (msg: GlobalPositionUpdateMsg) => void;
   loginResponseMsg: (msg: Message | LoginResponseMessage) => void;
   userDisconnectMsg: (msg: UserDCMessage) => void;
@@ -69,6 +80,7 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {
   loginMsg: (msg: loginMsg) => void;
   createLobbyEvent: (msg: CreateLobbyMessage) => void;
+  joinLobbyEvent: (msg: JoinLobbyMessage) => void;
   playerUpdateEvent: (msg: User) => void;
   playerLeftGameEvent: (msg: UserDCMessage) => void;
   playerJoinedGameEvent: (msg: UserJoinedGameMsg) => void;

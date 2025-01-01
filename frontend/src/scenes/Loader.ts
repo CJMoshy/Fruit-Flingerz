@@ -281,6 +281,6 @@ export default class Loader extends Phaser.Scene {
       repeat: 0,
     });
 
-    this.scene.start("menuScene");
+    this.scene.start("lobbyScene");
   }
 }

@@ -48,7 +48,7 @@ export default class ConnectionManager {
         this.playersInGame.has(player[0]) === false
       ) {
         console.log(
-          "character was already loaded into sprite pool or is in lobby",
+          "character was already loaded into sprite pool or is in menu",
         );
         continue;
       }

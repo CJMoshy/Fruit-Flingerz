@@ -69,6 +69,48 @@ socket.on("userLeftGameMsg", (msg) => {
   connectionManager.removeUserFromSpritePool(msg.id);
 });
 
+socket.on("lobbyCreatedMsg", (msg) => {
+  if (msg.created) {
+    console.log("lobby created success, connected to lobby");
+    document.dispatchEvent(new Event("lobbySuccessEvent"));
+  } else {
+    let message = "";
+    if (msg.status === 409) {
+      message = "Error creating lobby. lobby with this name exists";
+    } else {
+      message = "An unexpected error occoured (LOBBY:1)";
+    }
+    alert(message);
+  }
+});
+
+socket.on("lobbyJoinedMsg", (msg) => {
+  if (msg.joined) {
+    console.log("joined lobby success");
+    msg.usersInGame.forEach((user) => {
+      connectionManager.addPlayerInGame(user.user_id);
+      connectionManager.updateUser(user.user_id, user.currentTexture!, true); // care
+    });
+    document.dispatchEvent(new Event("lobbySuccessEvent"));
+  } else {
+    let message = "";
+    if (msg.status === 404) {
+      message = "Error joining lobby. lobby not found";
+    } else {
+      message = "An unexpected error occoured (LOBBY:2)";
+    }
+    alert(message);
+  }
+});
+
 export function logUserIn(loginMsg: LoginMessage) {
   socket.emit("loginMsg", loginMsg);
+}
+
+export function createLobby(lobbyName: string) {
+  socket.emit("createLobbyEvent", { lobbyName: lobbyName });
+}
+
+export function joinLobby(lobbyName: string) {
+  socket.emit("joinLobbyEvent", { lobbyName: lobbyName }); // can simplify to just lobby name
 }
