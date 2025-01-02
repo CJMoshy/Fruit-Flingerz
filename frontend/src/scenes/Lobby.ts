@@ -6,17 +6,28 @@ export default class Lobby extends Phaser.Scene {
   joinLobbyInput!: Phaser.GameObjects.DOMElement;
   joinLobbySubmit!: Phaser.GameObjects.DOMElement;
 
+  private lobbySuccessListener: EventListener;
+
   constructor() {
     super({ key: "lobbyScene" });
-    document.addEventListener("lobbySuccessEvent", () => {
+
+    this.lobbySuccessListener = () => {
       if (this.scene.isActive("lobbyScene")) {
+        console.log("scene activ");
         this.scene.stop("lobbyScene");
         this.scene.start("menuScene");
       }
-    });
+    };
+    document.addEventListener("lobbySuccessEvent", this.lobbySuccessListener);
   }
 
   create() {
+    this.events.on("destroy", () => {
+      document.removeEventListener(
+        "lobbySuccessEvent",
+        this.lobbySuccessListener,
+      );
+    });
     let lobbyName = "";
     this.createLobbyInput = this.add.dom(
       this.sys.canvas.width / 2,

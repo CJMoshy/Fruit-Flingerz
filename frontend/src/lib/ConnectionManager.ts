@@ -11,11 +11,6 @@ export default class ConnectionManager {
     this.spritePool = new Array();
   }
 
-  addUser(id: UserID, user: User) {
-    if (this.connectedPlayers.has(id)) return;
-    this.connectedPlayers.set(id, user);
-  }
-
   addPlayerInGame(id: UserID) {
     this.playersInGame.add(id);
   }
@@ -27,6 +22,12 @@ export default class ConnectionManager {
   hasPlayerInGame(id: UserID): boolean {
     return this.playersInGame.has(id);
   }
+
+  addUser(id: UserID, user: User) {
+    if (this.connectedPlayers.has(id)) return;
+    this.connectedPlayers.set(id, user);
+  }
+
   // this can prob be redone more elegantly
   removeUser(id: UserID): void {
     if (this.connectedPlayers.delete(id) === false) {
@@ -38,17 +39,22 @@ export default class ConnectionManager {
     console.log(`removed player ${id} from connected users list`);
     this.removeUserFromSpritePool(id);
   }
-  // this method is used when a new player joins the server and loads into the game for the first time
-  // or when the player backs out to the menu and re-joins. If a player is in the menu or connected to the server when
-  // another player joins game (playScene) this method will skip the iteration for that player (33-35)
+
+  /**
+   * used when a new player joins the server and loads into the game for the first time
+   * or when the player backs out to the menu and re-joins. If a player is in the menu or connected to the server when
+   * another player joins game (playScene) this method will skip the iteration for that player (33-35)
+   */
   createUsers(scene: Phaser.Scene): void {
     for (const player of this.connectedPlayers) {
       if (
         this.spritePool.find((e) => e.user_id === player[0]) ||
-        this.playersInGame.has(player[0]) === false
+        this.playersInGame.has(player[0]) === false // shitty code but this will keep people in other lobbys from getting in
       ) {
         console.log(
           "character was already loaded into sprite pool or is in menu",
+          this.spritePool.find((e) => e.user_id === player[0]),
+          this.playersInGame.has(player[0]),
         );
         continue;
       }
@@ -109,13 +115,11 @@ export default class ConnectionManager {
   }
 
   addUserToSpritePool(scene: Phaser.Scene, id: UserID) {
-    console.log(this.spritePool);
     if (this.spritePool.find((e) => e.user_id === id)) {
       console.log("character was already loaded into sprite pool");
       return;
     }
     const data = this.connectedPlayers.get(id);
-    console.log(data);
     const opp = new Opponent(
       scene,
       100,

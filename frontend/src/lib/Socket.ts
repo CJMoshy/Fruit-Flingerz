@@ -8,12 +8,13 @@ export const loginMsg: LoginMessage = {
 };
 
 const URL = "http://localhost:3000";
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   URL,
 );
 
 socket.on("connect", () => {
   console.log("conncted");
+  document.dispatchEvent(new Event("connected"));
 });
 
 socket.on("connect_error", (err) => {
@@ -87,7 +88,7 @@ socket.on("lobbyCreatedMsg", (msg) => {
 
 socket.on("lobbyJoinedMsg", (msg) => {
   if (msg.joined) {
-    console.log("joined lobby success");
+    console.log("joined lobby success", msg);
     msg.usersInGame.forEach((user) => {
       connectionManager.addPlayerInGame(user.user_id);
       connectionManager.updateUser(user.user_id, user.currentTexture!, true); // care
@@ -137,4 +138,16 @@ export function joinScene(id: UserID, texture: string = "appearing-anim") {
 
 export function exitScene(id: UserID) {
   socket.emit("playerLeftGameEvent", { id: id });
+}
+
+export function disconnectFromServer() {
+  socket.disconnect();
+}
+
+export function connectToServer() {
+  socket.connect();
+}
+
+export function isSocketConnected(): boolean {
+  return socket.connected;
 }

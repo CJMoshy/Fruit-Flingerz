@@ -7,17 +7,22 @@ export default class Play extends Phaser.Scene {
   private playScreen!: Phaser.GameObjects.TileSprite;
   private selectedCharModel: CharacterModel = "player01";
 
+  private userJoinedGameListener: (e: CustomEvent) => void;
+
   constructor() {
     super({ key: "playScene" });
 
+    // Define the listener function and store it in a variable
+    this.userJoinedGameListener = (e: CustomEvent) => {
+      if (this.scene.isActive("playScene")) {
+        console.log(e.detail);
+        connectionManager.addUserToSpritePool(this, e.detail);
+      }
+    };
+
     document.addEventListener(
       "userJoinedGame",
-      ((e: CustomEvent) => {
-        if (this.scene.isActive("playScene")) {
-          console.log(e.detail);
-          connectionManager.addUserToSpritePool(this, e.detail);
-        }
-      }) as EventListener,
+      this.userJoinedGameListener as EventListener,
     );
   }
 
@@ -28,6 +33,14 @@ export default class Play extends Phaser.Scene {
   preload(): void {}
 
   create(): void {
+    // this doesnt seem to remove the event
+    this.events.on("destroy", () => {
+      console.log("destroy playScene");
+      document.removeEventListener(
+        "userJoinedGame",
+        this.userJoinedGameListener as EventListener,
+      );
+    });
     //load backgorund
     if (this.textures.exists("BG-purple")) {
       this.playScreen = this.add.tileSprite(0, 0, 800, 640, "BG-purple")

@@ -4,7 +4,13 @@ import Play from "./scenes/Play.ts";
 import Loader from "./scenes/Loader.ts";
 import Lobby from "./scenes/Lobby.ts";
 import ConnectionManager from "./lib/ConnectionManager.ts";
-import { loginMsg, logUserIn } from "./lib/Socket.ts";
+import {
+  connectToServer,
+  disconnectFromServer,
+  isSocketConnected,
+  loginMsg,
+  logUserIn,
+} from "./lib/Socket.ts";
 import { verifyUsername } from "./lib/Verify.ts";
 
 export const CONFIG: Phaser.Types.Core.GameConfig = {
@@ -29,24 +35,64 @@ export const CONFIG: Phaser.Types.Core.GameConfig = {
   scene: [Loader, Lobby, Menu, Play],
 };
 
-export const loggedin: boolean = false;
-
 export const connectionManager = new ConnectionManager();
+
+let game: Phaser.Game | null = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   // new Phaser.Game(CONFIG);
+
   const usernameField = document.getElementById(
     "username-field",
   ) as HTMLInputElement;
+
+  const disconnectBtn = document.getElementById(
+    "disconnect-btn",
+  )! as HTMLButtonElement;
+
+  const reconnectBtn = document.getElementById(
+    "reconnect-btn",
+  ) as HTMLButtonElement;
+  const loginBtn = document.getElementById("login-btn")! as HTMLButtonElement;
+
+  // listeners
   usernameField.addEventListener("input", () => {
     loginMsg.username = usernameField.value;
   });
-  document.getElementById("login-btn")!.addEventListener("click", () => {
+
+  loginBtn.addEventListener("click", () => {
     if (verifyUsername(loginMsg.username)) {
-      //   logUserIn(loginMsg);
-      console.log("verified");
+      logUserIn(loginMsg);
     }
   });
-});
 
-document.addEventListener("connectionSuccess", () => new Phaser.Game(CONFIG));
+  disconnectBtn.addEventListener("click", () => {
+    if (game) {
+      game.destroy(true);
+      connectionManager.clearAllUsersFromSpritePool();
+      disconnectFromServer();
+      disconnectBtn.disabled = true;
+      reconnectBtn.disabled = false;
+    }
+  });
+
+  reconnectBtn.addEventListener("click", () => {
+    if (isSocketConnected() === false) {
+      connectToServer();
+    }
+  });
+
+  document.addEventListener("connected", () => {
+    loginBtn.disabled = false;
+    reconnectBtn.disabled = true;
+  });
+
+  document.addEventListener(
+    "connectionSuccess",
+    () => {
+      loginBtn.disabled = true;
+      disconnectBtn.disabled = false;
+      game = new Phaser.Game(CONFIG);
+    },
+  );
+});

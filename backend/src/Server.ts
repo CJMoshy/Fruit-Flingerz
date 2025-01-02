@@ -38,6 +38,14 @@ io.on("connection", (socket) => {
       } as Message);
     } else { // new user
       users.push({ id: msg.username, socket: socket, lobby: "none" });
+
+      // send a message back to the specific user
+      socket.emit("loginResponseMsg", {
+        status: 200,
+        users: spritesList,
+      } as LoginResponseMessage);
+      
+      // moved to below line 43 was above*
       const newUserToken: User = {
         user_id: msg.username,
         inGame: false,
@@ -51,16 +59,11 @@ io.on("connection", (socket) => {
       };
 
       // add it to server list
-      spritesList.push(newUserToken); // here is logic error although its handled on client side we still send the user it itself *
-
-      // send a message back to the specific user
-      socket.emit("loginResponseMsg", {
-        status: 200,
-        users: spritesList,
-      } as LoginResponseMessage);
+      spritesList.push(newUserToken);
+      // end moved*
 
       // notify all connected users about the new user except user that just connected
-      socket.broadcast.emit("newUserMsg", { user: newUserToken }); // making this broadcast redundant *
+      socket.broadcast.emit("newUserMsg", { user: newUserToken });
     }
   });
 
@@ -68,6 +71,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("socket disconnected from server", socket.id);
     // find the user in the socket list
+    console.log(users);
     const userToDisconnectIndex = users.findIndex((user) =>
       user.socket.id === socket.id
     );
@@ -171,7 +175,7 @@ io.on("connection", (socket) => {
     if (!user) return;
     const { lobby } = user;
     // end func
-    
+
     socket.to(lobby).emit("globalPositionUpdateMsg", {
       id: spritesList[index].user_id,
       data: spritesList[index],
