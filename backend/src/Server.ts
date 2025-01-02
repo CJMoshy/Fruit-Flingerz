@@ -42,9 +42,8 @@ io.on("connection", (socket) => {
       // send a message back to the specific user
       socket.emit("loginResponseMsg", {
         status: 200,
-        users: spritesList,
-      } as LoginResponseMessage);
-      
+      });
+
       // moved to below line 43 was above*
       const newUserToken: User = {
         user_id: msg.username,
@@ -61,9 +60,6 @@ io.on("connection", (socket) => {
       // add it to server list
       spritesList.push(newUserToken);
       // end moved*
-
-      // notify all connected users about the new user except user that just connected
-      socket.broadcast.emit("newUserMsg", { user: newUserToken });
     }
   });
 
@@ -132,25 +128,37 @@ io.on("connection", (socket) => {
     const response: JoinLobbyResponseMessage = {
       status: 200,
       joined: true,
+      allUsers: [],
       usersInGame: [],
     };
 
     if (activeLobbies.has(msg.lobbyName)) {
-      user.socket.join(msg.lobbyName);
+      socket.join(msg.lobbyName);
       user.lobby = msg.lobbyName;
+      const spr = spritesList.find((spr) => spr.user_id === user.id);
+      if (spr === undefined) {
+        console.log(
+          "failed to find a user in sprites list with correct id, could be bad",
+        );
+        return;
+      }
+      socket.to(msg.lobbyName).emit("newUserMsg", { user: spr });
 
-      // all the users in the current lobby
+      // all the users in the current lobby  full data
       const usersInLobby = users.filter((user) => user.lobby === msg.lobbyName);
 
+      //send this list back to the socket
       // get only the ids
       const userIds: UserID[] = [];
       usersInLobby.forEach((e) => userIds.push(e.id));
 
-      // only get sprites that are in the lobby AND in the game
-      // otherwise the join and leave events will do the work
-      response.usersInGame = spritesList.filter((spr) =>
+      //send the ids of who is in game
+      response.usersInGame = userIds;
+
+      // send the data of all users in the lobby
+      response.allUsers = spritesList.filter((spr) =>
         userIds.includes(spr.user_id)
-      ).filter((spr) => spr.inGame === true);
+      );
     } else {
       response.status = 404;
       response.joined = false;

@@ -28,6 +28,11 @@ export default class ConnectionManager {
     this.connectedPlayers.set(id, user);
   }
 
+  removeAllUsers() {
+    this.connectedPlayers.forEach((player) => {
+      this.removeUser(player.user_id);
+    });
+  }
   // this can prob be redone more elegantly
   removeUser(id: UserID): void {
     if (this.connectedPlayers.delete(id) === false) {
@@ -48,26 +53,14 @@ export default class ConnectionManager {
   createUsers(scene: Phaser.Scene): void {
     for (const player of this.connectedPlayers) {
       if (
-        this.spritePool.find((e) => e.user_id === player[0]) ||
-        this.playersInGame.has(player[0]) === false // shitty code but this will keep people in other lobbys from getting in
+        this.playersInGame.has(player[0]) === false
       ) {
         console.log(
-          "character was already loaded into sprite pool or is in menu",
-          this.spritePool.find((e) => e.user_id === player[0]),
-          this.playersInGame.has(player[0]),
+          `attempting to load in character ${player[0]} but char is in menu`,
         );
         continue;
       }
-      const opp = new Opponent(
-        scene,
-        100,
-        100,
-        "appearing-anim",
-        0,
-        player[1].currentTexture! as CharacterModel,
-        player[1].user_id,
-      );
-      this.spritePool.push({ user_id: player[0], entity: opp });
+      this.addUserToSpritePool(scene, player[0]);
     }
   }
 
@@ -120,6 +113,7 @@ export default class ConnectionManager {
       return;
     }
     const data = this.connectedPlayers.get(id);
+    console.log(data);
     const opp = new Opponent(
       scene,
       100,

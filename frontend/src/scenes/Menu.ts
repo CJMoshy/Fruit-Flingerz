@@ -133,7 +133,7 @@ export default class Menu extends Phaser.Scene {
     });
   }
 
-  update(time: number, delta: number): void {
+  override update(time: number, delta: number): void {
     this.scrollingScreen.tilePositionY += 1;
   }
 }

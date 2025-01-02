@@ -26,10 +26,6 @@ interface LoginMessage extends Message {
   password: string;
 }
 
-interface LoginResponseMessage extends Message {
-  users: User[];
-}
-
 interface CreateLobbyMessage extends Message {
   lobbyName: string;
 }
@@ -44,7 +40,8 @@ interface CreateLobbyResponseMsg extends Message {
 
 interface JoinLobbyResponseMessage extends Message {
   joined: boolean;
-  usersInGame: User[];
+  allUsers: User[];
+  usersInGame: UserID[];
 }
 
 interface NewUserMessage extends Message {

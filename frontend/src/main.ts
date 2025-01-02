@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
   disconnectBtn.addEventListener("click", () => {
     if (game) {
       game.destroy(true);
-      connectionManager.clearAllUsersFromSpritePool();
+      connectionManager.removeAllUsers();
       disconnectFromServer();
       disconnectBtn.disabled = true;
       reconnectBtn.disabled = false;

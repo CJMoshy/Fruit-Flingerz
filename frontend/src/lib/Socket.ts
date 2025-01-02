@@ -29,10 +29,6 @@ socket.on("loginResponseMsg", (msg) => {
     console.error("Error Logging In. A user with this name already exists");
     return;
   }
-  for (const user of msg.users) {
-    if (user.user_id === loginMsg.username) continue;
-    connectionManager.addUser(user.user_id, user);
-  }
   document.dispatchEvent(new Event("connectionSuccess"));
 });
 
@@ -88,10 +84,11 @@ socket.on("lobbyCreatedMsg", (msg) => {
 
 socket.on("lobbyJoinedMsg", (msg) => {
   if (msg.joined) {
-    console.log("joined lobby success", msg);
-    msg.usersInGame.forEach((user) => {
-      connectionManager.addPlayerInGame(user.user_id);
-      connectionManager.updateUser(user.user_id, user.currentTexture!, true); // care
+    msg.allUsers.forEach((user) => {
+      connectionManager.addUser(user.user_id, user);
+    });
+    msg.usersInGame.forEach((id) => {
+      connectionManager.addPlayerInGame(id);
     });
     document.dispatchEvent(new Event("lobbySuccessEvent"));
   } else {

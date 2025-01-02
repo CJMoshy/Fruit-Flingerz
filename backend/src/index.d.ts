@@ -27,10 +27,6 @@ interface LoginMesssage extends Message {
   password: string;
 }
 
-interface LoginResponseMessage extends Message {
-  users: User[];
-}
-
 interface CreateLobbyMessage extends Message {
   lobbyName: string;
 }
@@ -45,7 +41,8 @@ interface CreateLobbyResponseMsg extends Message {
 
 interface JoinLobbyResponseMessage extends Message {
   joined: boolean;
-  usersInGame: User[];
+  allUsers: User[];
+  usersInGame: UserID[];
 }
 
 interface NewUserMessage extends Message {
@@ -71,7 +68,7 @@ interface ServerToClientEvents {
   lobbyCreatedMsg: (msg: CreateLobbyResponseMsg) => void;
   lobbyJoinedMsg: (msg: JoinLobbyResponseMessage) => void;
   globalPositionUpdateMsg: (msg: GlobalPositionUpdateMsg) => void;
-  loginResponseMsg: (msg: Message | LoginResponseMessage) => void;
+  loginResponseMsg: (msg: Message) => void;
   userDisconnectMsg: (msg: UserDCMessage) => void;
   userLeftGameMsg: (msg: UserDCMessage) => void;
   userJoinedGameMsg: (msg: UserJoinedGameMsg) => void;
