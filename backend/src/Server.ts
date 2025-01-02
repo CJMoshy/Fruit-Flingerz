@@ -44,7 +44,6 @@ io.on("connection", (socket) => {
         status: 200,
       });
 
-      // moved to below line 43 was above*
       const newUserToken: User = {
         user_id: msg.username,
         inGame: false,
@@ -59,7 +58,6 @@ io.on("connection", (socket) => {
 
       // add it to server list
       spritesList.push(newUserToken);
-      // end moved*
     }
   });
 
@@ -67,7 +65,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("socket disconnected from server", socket.id);
     // find the user in the socket list
-    console.log(users);
     const userToDisconnectIndex = users.findIndex((user) =>
       user.socket.id === socket.id
     );
@@ -122,8 +119,8 @@ io.on("connection", (socket) => {
 
   // handle for joining lobbys
   socket.on("joinLobbyEvent", (msg) => {
-    const user = users.find((user) => user.socket.id === socket.id); // assert
-    if (!user) return;
+    const thisUser = users.find((user) => user.socket.id === socket.id); // assert
+    if (!thisUser) return;
 
     const response: JoinLobbyResponseMessage = {
       status: 200,
@@ -134,8 +131,8 @@ io.on("connection", (socket) => {
 
     if (activeLobbies.has(msg.lobbyName)) {
       socket.join(msg.lobbyName);
-      user.lobby = msg.lobbyName;
-      const spr = spritesList.find((spr) => spr.user_id === user.id);
+      thisUser.lobby = msg.lobbyName;
+      const spr = spritesList.find((spr) => spr.user_id === thisUser.id);
       if (spr === undefined) {
         console.log(
           "failed to find a user in sprites list with correct id, could be bad",
@@ -144,21 +141,23 @@ io.on("connection", (socket) => {
       }
       socket.to(msg.lobbyName).emit("newUserMsg", { user: spr });
 
-      // all the users in the current lobby  full data
-      const usersInLobby = users.filter((user) => user.lobby === msg.lobbyName);
-
-      //send this list back to the socket
-      // get only the ids
-      const userIds: UserID[] = [];
-      usersInLobby.forEach((e) => userIds.push(e.id));
-
-      //send the ids of who is in game
-      response.usersInGame = userIds;
-
-      // send the data of all users in the lobby
-      response.allUsers = spritesList.filter((spr) =>
-        userIds.includes(spr.user_id)
+      // all the users in the current lobby except this socket/user full data
+      const usersInLobby = users.filter((user) =>
+        user.lobby === msg.lobbyName && user.id !== thisUser.id
       );
+
+      // Get only the ids of users in the lobby
+      const userIds = usersInLobby.map((user) => user.id);
+      
+      // get all users in the lobby
+      spritesList.forEach((spr) => {
+        if (userIds.includes(spr.user_id)) {
+          response.allUsers.push(spr);
+          if (spr.inGame) { // get users also in game but just the ids
+            response.usersInGame.push(spr.user_id);
+          }
+        }
+      });
     } else {
       response.status = 404;
       response.joined = false;

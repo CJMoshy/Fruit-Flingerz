@@ -32,8 +32,10 @@ export default class ConnectionManager {
     this.connectedPlayers.forEach((player) => {
       this.removeUser(player.user_id);
     });
+    this.playersInGame.clear();
   }
-  // this can prob be redone more elegantly
+  
+  
   removeUser(id: UserID): void {
     if (this.connectedPlayers.delete(id) === false) {
       console.log(

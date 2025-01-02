@@ -88,6 +88,7 @@ socket.on("lobbyJoinedMsg", (msg) => {
       connectionManager.addUser(user.user_id, user);
     });
     msg.usersInGame.forEach((id) => {
+      console.log(id);
       connectionManager.addPlayerInGame(id);
     });
     document.dispatchEvent(new Event("lobbySuccessEvent"));

@@ -54,7 +54,6 @@ export default class Player extends Entity {
       "animationcomplete",
       () => {
         super.removeFromScene();
-        // socket.emit("playerLeftGameEvent", { id: this.userName });
         exitScene(this.userName);
         this.parentScene.scene.stop("playScene");
         this.parentScene.scene.start("menuScene");
