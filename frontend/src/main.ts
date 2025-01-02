@@ -5,6 +5,7 @@ import Loader from "./scenes/Loader.ts";
 import Lobby from "./scenes/Lobby.ts";
 import ConnectionManager from "./lib/ConnectionManager.ts";
 import { loginMsg, logUserIn } from "./lib/Socket.ts";
+import { verifyUsername } from "./lib/Verify.ts";
 
 export const CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.CANVAS,
@@ -41,11 +42,16 @@ document.addEventListener("DOMContentLoaded", () => {
     loginMsg.username = usernameField.value;
   });
   document.getElementById("login-btn")!.addEventListener("click", () => {
-    if (loginMsg.username !== "") {
-      logUserIn(loginMsg);
-    } else {
-      console.log("no username or password");
-    }
+    verifyUsername(loginMsg.username);
+    // if (loginMsg.username.length > 15) {
+    //   alert("Username is too long");
+    //   return;
+    // }
+    // if (loginMsg.username !== "") {
+    //   logUserIn(loginMsg);
+    // } else {
+    //   console.log("no username or password");
+    // }
   });
 });
 

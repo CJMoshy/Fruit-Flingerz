@@ -1,6 +1,5 @@
-import StateMachine from "../lib/StateMachine.ts";
-import { State } from "../lib/StateMachine.ts";
-import { socket } from "../lib/Socket.ts";
+import StateMachine, { State } from "../lib/StateMachine.ts";
+import { exitScene, joinScene, sendUpdateEvent } from "../lib/Socket.ts";
 import { loginMsg } from "../lib/Socket.ts";
 import Entity from "./Entity.ts";
 
@@ -47,22 +46,16 @@ export default class Player extends Entity {
       jump: new jumpState(),
     }, [scene, this]);
 
-    this.joinScene(texture);
+    joinScene(this.userName, texture);
   }
 
-  joinScene(texture: string = "appearing-anim") {
-    socket.emit("playerJoinedGameEvent", {
-      id: this.userName,
-      texture: texture,
-    });
-  }
-
-  exitScene() {
+  returnToMenu() {
     this.anims.play("disappearing-anim").on(
       "animationcomplete",
       () => {
         super.removeFromScene();
-        socket.emit("playerLeftGameEvent", { id: this.userName });
+        // socket.emit("playerLeftGameEvent", { id: this.userName });
+        exitScene(this.userName);
         this.parentScene.scene.stop("playScene");
         this.parentScene.scene.start("menuScene");
       },
@@ -72,8 +65,9 @@ export default class Player extends Entity {
   override update(): void {
     super.update();
     // this is the next problem. Emitting an event/ping to the server every update tick just seems nasty
-    socket.emit("playerUpdateEvent", {
+    sendUpdateEvent({
       user_id: loginMsg.username,
+      inGame: true,
       position: {
         x: this.x,
         y: this.y,

@@ -58,6 +58,7 @@ socket.on("globalPositionUpdateMsg", (msg) => {
 });
 
 socket.on("userJoinedGameMsg", (msg) => {
+  console.log("user join msg", msg);
   connectionManager.addPlayerInGame(msg.id);
   connectionManager.updateUser(msg.id, msg.texture, true);
   document.dispatchEvent(new CustomEvent("userJoinedGame", { detail: msg.id }));
@@ -103,6 +104,14 @@ socket.on("lobbyJoinedMsg", (msg) => {
   }
 });
 
+/**
+ * used to ping the server with in game data
+ * @param userData standard user object describing data relative to current game state
+ */
+export function sendUpdateEvent(userData: User) {
+  socket.emit("playerUpdateEvent", userData);
+}
+
 export function logUserIn(loginMsg: LoginMessage) {
   socket.emit("loginMsg", loginMsg);
 }
@@ -113,4 +122,19 @@ export function createLobby(lobbyName: string) {
 
 export function joinLobby(lobbyName: string) {
   socket.emit("joinLobbyEvent", { lobbyName: lobbyName }); // can simplify to just lobby name
+}
+
+export function joinScene(id: UserID, texture: string = "appearing-anim") {
+  if (id === "") {
+    console.error("user name is empty");
+    return;
+  }
+  socket.emit("playerJoinedGameEvent", {
+    id: id,
+    texture: texture,
+  });
+}
+
+export function exitScene(id: UserID) {
+  socket.emit("playerLeftGameEvent", { id: id });
 }

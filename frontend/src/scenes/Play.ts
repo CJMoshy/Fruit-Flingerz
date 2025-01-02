@@ -77,7 +77,7 @@ export default class Play extends Phaser.Scene {
       "pointerdown",
       () => {
         connectionManager.clearAllUsersFromSpritePool();
-        this.player.exitScene();
+        this.player.returnToMenu();
       },
     );
   }

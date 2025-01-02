@@ -51,7 +51,7 @@ io.on("connection", (socket) => {
       };
 
       // add it to server list
-      spritesList.push(newUserToken);
+      spritesList.push(newUserToken); // here is logic error although its handled on client side we still send the user it itself *
 
       // send a message back to the specific user
       socket.emit("loginResponseMsg", {
@@ -60,13 +60,13 @@ io.on("connection", (socket) => {
       } as LoginResponseMessage);
 
       // notify all connected users about the new user except user that just connected
-      socket.broadcast.emit("newUserMsg", { user: newUserToken });
+      socket.broadcast.emit("newUserMsg", { user: newUserToken }); // making this broadcast redundant *
     }
   });
 
   // emitted when a user disconnects from the server
   socket.on("disconnect", () => {
-    console.log("socket disconnected from server");
+    console.log("socket disconnected from server", socket.id);
     // find the user in the socket list
     const userToDisconnectIndex = users.findIndex((user) =>
       user.socket.id === socket.id
@@ -94,11 +94,12 @@ io.on("connection", (socket) => {
     spritesList.splice(spriteDataIndex, 1);
 
     // only emit the user dc message once both have been removed TODO fix more clean logic
-    io.emit("userDisconnectMsg", { id: removedUser[0].id });
+    io.emit("userDisconnectMsg", { id: removedUser[0].id }); // sometimes the server fails line 87 and this doesnt get sent out
   });
 
+  // handle creating lobbys
   socket.on("createLobbyEvent", (msg) => {
-    const user = users.find((user) => user.socket.id === socket.id);
+    const user = users.find((user) => user.socket.id === socket.id); // assert request comes from registered user
     if (!user) return;
 
     const response: CreateLobbyResponseMsg = {
@@ -106,20 +107,22 @@ io.on("connection", (socket) => {
       created: true,
     };
 
+    // lobby exists
     if (activeLobbies.has(msg.lobbyName)) {
       response.status = 409;
       response.created = false;
-    } else {
+    } else { // make a new lobby
       activeLobbies.add(msg.lobbyName);
-      socket.join(msg.lobbyName);
+      socket.join(msg.lobbyName); // connect requester
       user.lobby = msg.lobbyName;
     }
 
     socket.emit("lobbyCreatedMsg", response);
   });
 
+  // handle for joining lobbys
   socket.on("joinLobbyEvent", (msg) => {
-    const user = users.find((user) => user.socket.id === socket.id);
+    const user = users.find((user) => user.socket.id === socket.id); // assert
     if (!user) return;
 
     const response: JoinLobbyResponseMessage = {
@@ -163,11 +166,12 @@ io.on("connection", (socket) => {
     spritesList[index].currentTexture = msg.currentTexture;
     spritesList[index].flipX = msg.flipX;
 
-    // can likely turn these three into function getUserRoom
+    // can likely turn into function getUserRoom
     const user = users.find((user) => user.socket.id === socket.id);
     if (!user) return;
     const { lobby } = user;
-
+    // end func
+    
     socket.to(lobby).emit("globalPositionUpdateMsg", {
       id: spritesList[index].user_id,
       data: spritesList[index],

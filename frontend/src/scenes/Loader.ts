@@ -187,7 +187,7 @@ export default class Loader extends Phaser.Scene {
         start: 0,
         end: 5,
       }),
-      frameRate: 20,
+      frameRate: 25,
       repeat: 0,
     });
 
@@ -217,7 +217,7 @@ export default class Loader extends Phaser.Scene {
         start: 0,
         end: 5,
       }),
-      frameRate: 20,
+      frameRate: 25,
       repeat: 0,
     });
 
@@ -247,7 +247,7 @@ export default class Loader extends Phaser.Scene {
         start: 0,
         end: 5,
       }),
-      frameRate: 20,
+      frameRate: 25,
       repeat: 0,
     });
 
@@ -277,7 +277,7 @@ export default class Loader extends Phaser.Scene {
         start: 0,
         end: 5,
       }),
-      frameRate: 20,
+      frameRate: 25,
       repeat: 0,
     });
 
