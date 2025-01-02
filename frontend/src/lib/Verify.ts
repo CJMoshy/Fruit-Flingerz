@@ -2,7 +2,7 @@ const RE = new RegExp("^[a-zA-Z0-9_-]+$");
 const MAX_USERNAME_LENGTH = 15;
 
 export function verifyUsername(prospect: string): boolean {
-    prospect.trim();
+    prospect = prospect.trim();
     // check against regex to assert only aphanumerics, underscores and hyphens
     if (prospect.match(RE) === null) {
         alert(

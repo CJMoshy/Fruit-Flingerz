@@ -42,16 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loginMsg.username = usernameField.value;
   });
   document.getElementById("login-btn")!.addEventListener("click", () => {
-    verifyUsername(loginMsg.username);
-    // if (loginMsg.username.length > 15) {
-    //   alert("Username is too long");
-    //   return;
-    // }
-    // if (loginMsg.username !== "") {
-    //   logUserIn(loginMsg);
-    // } else {
-    //   console.log("no username or password");
-    // }
+    if (verifyUsername(loginMsg.username)) {
+      //   logUserIn(loginMsg);
+      console.log("verified");
+    }
   });
 });
 
