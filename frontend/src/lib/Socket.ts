@@ -14,7 +14,7 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
 
 socket.on("connect", () => {
   console.log("conncted");
-  document.dispatchEvent(new Event("connected"));
+  document.dispatchEvent(new Event("connectedBase"));
 });
 
 socket.on("connect_error", (err) => {
@@ -29,7 +29,7 @@ socket.on("loginResponseMsg", (msg) => {
     console.error("Error Logging In. A user with this name already exists");
     return;
   }
-  document.dispatchEvent(new Event("connectionSuccess"));
+  document.dispatchEvent(new Event("connectedGame"));
 });
 
 socket.on("newUserMsg", (msg) => {

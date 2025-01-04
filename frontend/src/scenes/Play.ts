@@ -15,7 +15,11 @@ export default class Play extends Phaser.Scene {
     // Define the listener function and store it in a variable
     this.userJoinedGameListener = (e: CustomEvent) => {
       if (this.scene.isActive("playScene")) {
-        console.log(e.detail);
+        console.log(
+          "playScene should be active right now, adding",
+          e.detail,
+          " to the spritepool",
+        );
         connectionManager.addUserToSpritePool(this, e.detail);
       }
     };

@@ -82,13 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.addEventListener("connected", () => {
+  document.addEventListener("connectedBase", () => {
     loginBtn.disabled = false;
     reconnectBtn.disabled = true;
   });
 
   document.addEventListener(
-    "connectionSuccess",
+    "connectedGame",
     () => {
       loginBtn.disabled = true;
       disconnectBtn.disabled = false;
