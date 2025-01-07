@@ -1,7 +1,7 @@
 export default class Entity extends Phaser.Physics.Arcade.Sprite {
   protected characterSprite: CharacterModel;
 
-  protected userName: string;
+  public userName: string;
 
   protected hitPoints: number;
 
@@ -41,6 +41,7 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
   public removeNamePlate() {
     this.namePlate.destroy();
   }
+
   private updateNamePlate() {
     this.namePlate.x = this.x;
     this.namePlate.y = this.y - 30;
@@ -49,6 +50,5 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
   public removeFromScene() {
     this.removeNamePlate();
     this.destroy();
-    console.log("destroyed", this);
   }
 }

@@ -63,6 +63,15 @@ interface GlobalPositionUpdateMsg extends Message {
   data: User; // FIX THIS MAKE DATA TYPE AND PASS THAT
 }
 
+interface FireProjectileMsg extends Message {
+  id: UserID;
+  position: {
+    x: number;
+    y: number;
+  };
+  velocity: number;
+}
+
 interface ServerToClientEvents {
   newUserMsg: (msg: NewUserMessage) => void;
   lobbyCreatedMsg: (msg: CreateLobbyResponseMsg) => void;
@@ -81,4 +90,5 @@ interface ClientToServerEvents {
   playerUpdateEvent: (msg: User) => void;
   playerLeftGameEvent: (msg: UserDCMessage) => void;
   playerJoinedGameEvent: (msg: UserJoinedGameMsg) => void;
+  fireProjectileEvent: (msg: FireProjectileMsg) => void;
 }

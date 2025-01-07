@@ -111,6 +111,10 @@ export function sendUpdateEvent(userData: User) {
   socket.emit("playerUpdateEvent", userData);
 }
 
+export function sendProjectileEvent(data: FireProjectileMsg) {
+  socket.emit("fireProjectileEvent", data);
+}
+
 export function logUserIn(loginMsg: LoginMessage) {
   socket.emit("loginMsg", loginMsg);
 }

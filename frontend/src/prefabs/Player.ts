@@ -1,7 +1,14 @@
 import StateMachine, { State } from "../lib/StateMachine.ts";
-import { exitScene, joinScene, sendUpdateEvent } from "../lib/Socket.ts";
+import {
+  exitScene,
+  joinScene,
+  sendProjectileEvent,
+  sendUpdateEvent,
+} from "../lib/Socket.ts";
 import { loginMsg } from "../lib/Socket.ts";
 import Entity from "./Entity.ts";
+
+import Projectile from "./Projectile.ts";
 
 export default class Player extends Entity {
   keys: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -37,6 +44,7 @@ export default class Player extends Entity {
       "left": Phaser.Input.Keyboard.KeyCodes.A,
       "right": Phaser.Input.Keyboard.KeyCodes.D,
       "up": Phaser.Input.Keyboard.KeyCodes.W,
+      "space": Phaser.Input.Keyboard.KeyCodes.SPACE,
     }) as Phaser.Types.Input.Keyboard.CursorKeys;
 
     this.FSM = new StateMachine("spawn", {
@@ -44,7 +52,18 @@ export default class Player extends Entity {
       idle: new idleState(),
       move: new moveState(),
       jump: new jumpState(),
+      shoot: new shootState(),
     }, [scene, this]);
+
+    // collider for projectiles
+    scene.physics.add.collider(
+      this,
+      Projectile as unknown as Phaser.Types.Physics.Arcade.ArcadeColliderType,
+      () => {
+        this.hitPoints -= 1;
+        console.log(this.hitPoints);
+      },
+    );
 
     joinScene(this.userName, texture);
   }
@@ -81,7 +100,7 @@ export default class Player extends Entity {
   }
 
   handleMovement() {
-    const vector: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
+    const vector = new Phaser.Math.Vector2(0, 0);
 
     if (this.keys.left.isDown) {
       this.setFlipX(true);
@@ -132,11 +151,14 @@ class idleState extends State {
     if (player.body?.velocity.y === 0 && !player.anims.isPlaying) {
       player.anims.play(`${player["characterSprite"]}-idle`);
     } else player.determineTexture();
+
     if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
       if (this.stateMachine !== undefined && player.isJumping === false) {
         player.anims.stop();
         this.stateMachine.transition("jump");
       }
+    } else if (Phaser.Input.Keyboard.JustDown(player.keys.space)) {
+      this.stateMachine.transition("shoot");
     }
 
     if (player.body?.blocked.down) {
@@ -173,6 +195,9 @@ class moveState extends State {
       }
     }
 
+    if (Phaser.Input.Keyboard.JustDown(player.keys.space)) {
+      this.stateMachine.transition("shoot");
+    }
     player.handleMovement();
   }
 }
@@ -191,10 +216,34 @@ class jumpState extends State {
     // if (player.body?.velocity.y !== undefined) {
     //     player.setVelocityY(player.body?.velocity.y + player.JUMP_VELOCITY) //hard mode ?
     // }
-    setTimeout(() => this.stateMachine?.transition("idle"), 500);
+    setTimeout(() => this.stateMachine.transition("idle"), 500);
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
     player.handleMovement();
+  }
+}
+
+class shootState extends State {
+  override enter(scene: Phaser.Scene, player: Player) {
+    new Projectile(
+      scene,
+      player.x,
+      player.y,
+      `star-${Phaser.Math.Between(1, 6)}`,
+      0,
+      500,
+      player.flipX ? -1 : 1,
+    ).fire();
+
+    sendProjectileEvent({
+      id: player.userName,
+      position: {
+        x: player.x,
+        y: player.y,
+      },
+      velocity: 500 * (player.flipX ? -1 : 1),
+    });
+    this.stateMachine.transition("idle");
   }
 }

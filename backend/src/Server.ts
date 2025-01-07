@@ -148,7 +148,7 @@ io.on("connection", (socket) => {
 
       // Get only the ids of users in the lobby
       const userIds = usersInLobby.map((user) => user.id);
-      
+
       // get all users in the lobby
       spritesList.forEach((spr) => {
         if (userIds.includes(spr.user_id)) {
@@ -187,6 +187,10 @@ io.on("connection", (socket) => {
       id: spritesList[index].user_id,
       data: spritesList[index],
     });
+  });
+
+  socket.on("fireProjectileEvent", (msg) => {
+    console.log("user wants to fire projectile", msg);
   });
 
   // sent when a player returns to the menu

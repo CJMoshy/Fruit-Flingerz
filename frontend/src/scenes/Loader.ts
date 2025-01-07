@@ -38,6 +38,13 @@ import selectLocked from "../assets/img/buttons/select/select_locked.png";
 import Appearing from "../assets/spritesheets/spawn/Appearing.png";
 import Disappearing from "../assets/spritesheets/spawn/Disappearing.png";
 
+import star1 from "../assets/img/star/star1.png";
+import star2 from "../assets/img/star/star2.png";
+import star3 from "../assets/img/star/star3.png";
+import star4 from "../assets/img/star/star4.png";
+import star5 from "../assets/img/star/star5.png";
+import star6 from "../assets/img/star/star6.png";
+
 export default class Loader extends Phaser.Scene {
   constructor() {
     super({ key: "loaderScene" });
@@ -72,6 +79,13 @@ export default class Loader extends Phaser.Scene {
     this.load.image("player04-jump", player4Jmp);
     this.load.image("player04-fall", player4Fall);
 
+    //stahrz
+    this.load.image("star-1", star1);
+    this.load.image("star-2", star2);
+    this.load.image("star-3", star3);
+    this.load.image("star-4", star4);
+    this.load.image("star-5", star5);
+    this.load.image("star-6", star6);
     //appearing and disappearing animation
     this.load.spritesheet("appear", Appearing, {
       frameWidth: 96,
