@@ -57,7 +57,7 @@ export default class Play extends Phaser.Scene {
     //create map
     const map = this.add.tilemap("tilemapJSON");
     const tileset = map.addTilesetImage(
-      "Terrain",
+      "base-tileset-pixel-adv",
       "base-tileset",
     ) as Phaser.Tilemaps.Tileset;
     const collisionLayer = map.createLayer(
@@ -90,17 +90,18 @@ export default class Play extends Phaser.Scene {
     });
 
     // button to return to the menu
-    this.add.image(100, 100, "levelBtn").setInteractive().on(
-      "pointerdown",
-      () => {
-        connectionManager.clearAllUsersFromSpritePool();
-        this.player.returnToMenu();
-      },
-    );
+    this.add.image(this.sys.canvas.width - 25, 25, "levelBtn").setInteractive()
+      .on(
+        "pointerdown",
+        () => {
+          connectionManager.clearAllUsersFromSpritePool();
+          this.player.returnToMenu();
+        },
+      );
   }
 
   update(): void {
-    this.playScreen.tilePositionY += 1;
+    this.playScreen.tilePositionY += 0.75;
     if (this.player.active) {
       this.player.update();
     }

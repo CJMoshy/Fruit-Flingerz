@@ -26,11 +26,11 @@ export default class Player extends Entity {
 
     this.parentScene = scene;
 
-    this.setGravityY(500);
+    this.setGravityY(700);
 
     //movement logic
     this.VELOCITY = 200; //player speed
-    this.JUMP_VELOCITY = -300; //jump speed
+    this.JUMP_VELOCITY = -350; //jump speed
     this.isJumping = false;
     this.jumpCount = 0;
     this.keys = scene.input.keyboard?.addKeys({

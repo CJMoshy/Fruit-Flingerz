@@ -40,8 +40,6 @@ export const connectionManager = new ConnectionManager();
 let game: Phaser.Game | null = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // new Phaser.Game(CONFIG);
-
   const usernameField = document.getElementById(
     "username-field",
   ) as HTMLInputElement;
