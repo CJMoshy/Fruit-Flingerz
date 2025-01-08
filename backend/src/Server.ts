@@ -189,8 +189,31 @@ io.on("connection", (socket) => {
     });
   });
 
+  // psuedo for projectiles
+
+  // interface projectile {
+  //   x: number;
+  //   y: number;
+  //   velocity: number;
+  //   lobby: string;
+  // }
+
+  // const projectiles: projectile[] = [];
+
+  // const updateProjectiles = () => {
+  //   projectiles.forEach((projectile) => {
+  //     projectile.x += projectile.velocity / 1000;
+  //     // io.to(projectile.lobby).emit("movingProjectile", projectile);
+  //   });
+  // };
+
+  // setInterval(updateProjectiles, 1);
+
+  // end pseudo except lines 215 and 216
   socket.on("fireProjectileEvent", (msg) => {
     console.log("user wants to fire projectile", msg);
+    // projectiles.push(new projectile)
+    // socket emit new projectile event
   });
 
   // sent when a player returns to the menu
