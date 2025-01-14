@@ -84,11 +84,19 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
-  loginMsg: (msg: loginMsg) => void;
+  loginMsg: (msg: LoginMesssage) => void;
   createLobbyEvent: (msg: CreateLobbyMessage) => void;
   joinLobbyEvent: (msg: JoinLobbyMessage) => void;
   playerUpdateEvent: (msg: User) => void;
   playerLeftGameEvent: (msg: UserDCMessage) => void;
   playerJoinedGameEvent: (msg: UserJoinedGameMsg) => void;
   fireProjectileEvent: (msg: FireProjectileMsg) => void;
+}
+
+interface Projectile {
+  x: number;
+  y: number;
+  velocity: number;
+  lobby: string; // only one that *might benefit from flyweight so prob not worth it
+  id: string;
 }
