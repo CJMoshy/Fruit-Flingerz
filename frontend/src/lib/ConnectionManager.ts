@@ -93,7 +93,9 @@ export default class ConnectionManager {
     }
     this.spritePool = new Array();
   }
-
+  getSpritePool(){
+    return this.spritePool
+  }
   removeUserFromSpritePool(id: UserID) {
     const spriteToRemoveIndex = this.spritePool.findIndex((sprite) =>
       sprite.user_id === id

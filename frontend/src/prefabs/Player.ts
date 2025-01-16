@@ -1,4 +1,5 @@
 import StateMachine, { State } from "../lib/StateMachine.ts";
+import ConnectionManager from "../lib/ConnectionManager.ts";
 import {
   exitScene,
   joinScene,
@@ -9,6 +10,7 @@ import { loginMsg } from "../lib/Socket.ts";
 import Entity from "./Entity.ts";
 
 import Projectile from "./Projectile.ts";
+import { connectionManager } from "../main.ts";
 
 export default class Player extends Entity {
   keys: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -55,19 +57,13 @@ export default class Player extends Entity {
       shoot: new shootState(),
     }, [scene, this]);
 
-    // collider for projectiles
-    scene.physics.add.collider(
-      this,
-      Projectile as unknown as Phaser.Types.Physics.Arcade.ArcadeColliderType,
-      () => {
-        this.hitPoints -= 1;
-        console.log(this.hitPoints);
-      },
-    );
-
     joinScene(this.userName, texture);
   }
 
+  takeHit() {
+    this.hitPoints -= 1;
+    console.log(this.hitPoints);
+  }
   returnToMenu() {
     this.anims.play("disappearing-anim").on(
       "animationcomplete",
@@ -226,7 +222,7 @@ class jumpState extends State {
 
 class shootState extends State {
   override enter(scene: Phaser.Scene, player: Player) {
-    new Projectile(
+    const p = new Projectile(
       scene,
       player.x,
       player.y,
@@ -234,8 +230,12 @@ class shootState extends State {
       0,
       500,
       player.flipX ? -1 : 1,
-    ).fire();
+    );
+    p.fire();
 
+    connectionManager.getSpritePool().forEach((spr) => {
+      scene.physics.add.overlap(spr.entity, p, () => p.destroy());
+    });
     sendProjectileEvent({
       id: player.userName,
       position: {

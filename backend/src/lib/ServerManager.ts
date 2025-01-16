@@ -1,8 +1,8 @@
 import { Server } from "socket.io";
 export default class ServerManager {
     //figure out these two later
-    public connectedUsers: ConnectedUser[];
-    public spritesList: User[];
+    private connectedUsers: ConnectedUser[];
+    private spritesList: User[];
     public activeLobbies: Set<string>;
 
     private activeProjectiles: Projectile[];
@@ -84,6 +84,36 @@ export default class ServerManager {
             return;
         }
         this.spritesList.splice(index, 1);
+    }
+    
+    setUserInGame(inGame: boolean, uID: UserID): boolean{
+        const sprIndex = this.getSpriteIndexByUserID(uID);
+        if (sprIndex === -1) return false;
+        this.spritesList[sprIndex].inGame = inGame;
+        return true;
+    }
+
+    populateLobbyResponseEvent(
+        msg: JoinLobbyResponseMessage,
+        _user: ConnectedUser,
+        lobbyName: string,
+    ) {
+        const usersInLobby = this.connectedUsers.filter((user) =>
+            user.lobby === lobbyName && user.id !== _user.id
+        );
+
+        // Get only the ids of users in the lobby
+        const userIds = usersInLobby.map((user) => user.id);
+
+        // get all users in the lobby
+        this.spritesList.forEach((spr) => {
+            if (userIds.includes(spr.user_id)) {
+                msg.allUsers.push(spr);
+                if (spr.inGame) { // get users also in game but just the ids
+                    msg.usersInGame.push(spr.user_id);
+                }
+            }
+        });
     }
 
     addProjectile(p: Projectile) {

@@ -103,6 +103,10 @@ socket.on("lobbyJoinedMsg", (msg) => {
   }
 });
 
+socket.on("newProjectileEvent", (msg) => {
+  document.dispatchEvent(new CustomEvent("createProjectile", { detail: msg }));
+});
+
 /**
  * used to ping the server with in game data
  * @param userData standard user object describing data relative to current game state

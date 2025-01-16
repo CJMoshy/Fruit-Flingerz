@@ -71,6 +71,14 @@ interface FireProjectileMsg extends Message {
   velocity: number;
 }
 
+interface NewProjectileMsg extends Message {
+  position: {
+    x: number;
+    y: number;
+  };
+  velocity: number;
+}
+
 interface ServerToClientEvents {
   newUserMsg: (msg: NewUserMessage) => void;
   lobbyCreatedMsg: (msg: CreateLobbyResponseMsg) => void;
@@ -80,6 +88,7 @@ interface ServerToClientEvents {
   userDisconnectMsg: (msg: UserDCMessage) => void;
   userLeftGameMsg: (msg: UserDCMessage) => void;
   userJoinedGameMsg: (msg: UserJoinedGameMsg) => void;
+  newProjectileEvent: (msg: NewProjectileMsg) => void;
 }
 
 interface ClientToServerEvents {

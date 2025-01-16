@@ -11,7 +11,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         texture: string,
         frame: number,
         velocity: number,
-        dx: dx,
+        dx?: dx,
     ) {
         super(scene, x, y, texture, frame);
 
@@ -21,7 +21,10 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setScale(0.75);
 
         this.velocity = velocity;
-        this.dx = dx;
+        if (dx) {
+            this.dx = dx;
+        } else this.dx = 1;
+        // this.dx = dx;
         this.directionVector = this.determineDirection();
 
         this.body?.world.on(

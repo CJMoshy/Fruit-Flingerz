@@ -1,6 +1,7 @@
 import Player from "../prefabs/Player.ts";
 import { connectionManager } from "../main.ts";
 import { loginMsg } from "../lib/Socket.ts";
+import Projectile from "../prefabs/Projectile.ts";
 
 export default class Play extends Phaser.Scene {
   private player!: Player;
@@ -8,12 +9,12 @@ export default class Play extends Phaser.Scene {
   private selectedCharModel: CharacterModel = "player01";
 
   private userJoinedGameListener: (e: CustomEvent) => void;
-
+  private createProjectileListener: (e: CustomEvent) => void;
   constructor() {
     super({ key: "playScene" });
 
     // Define the listener function and store it in a variable
-    this.userJoinedGameListener = (e: CustomEvent) => {
+    this.userJoinedGameListener = (e) => {
       if (this.scene.isActive("playScene")) {
         console.log(
           "playScene should be active right now, adding",
@@ -24,9 +25,21 @@ export default class Play extends Phaser.Scene {
       }
     };
 
+    this.createProjectileListener = (e) => {
+      if (this.scene.isActive("playScene")) {
+        console.log("incoming projectile!");
+        this.events.emit("makeProj", e);
+      }
+    };
+
     document.addEventListener(
       "userJoinedGame",
       this.userJoinedGameListener as EventListener,
+    );
+
+    document.addEventListener(
+      "createProjectile",
+      this.createProjectileListener as EventListener,
     );
   }
 
@@ -43,6 +56,11 @@ export default class Play extends Phaser.Scene {
       document.removeEventListener(
         "userJoinedGame",
         this.userJoinedGameListener as EventListener,
+      );
+
+      document.removeEventListener(
+        "createProjectile",
+        this.createProjectileListener as EventListener,
       );
     });
     //load backgorund
@@ -75,7 +93,7 @@ export default class Play extends Phaser.Scene {
       0,
       this.selectedCharModel,
       loginMsg.username,
-      2,
+      10,
     );
 
     //define collision logic for player and map
@@ -98,6 +116,22 @@ export default class Play extends Phaser.Scene {
           this.player.returnToMenu();
         },
       );
+
+    this.events.on("makeProj", (e: CustomEvent) => {
+      const p = new Projectile(
+        this,
+        e.detail.position.x,
+        e.detail.position.y,
+        `star-${Phaser.Math.Between(1, 6)}`,
+        0,
+        e.detail.velocity,
+      );
+
+      this.physics.add.collider(this.player, p, () => {
+        this.player.takeHit();
+        p.destroy();
+      });
+    });
   }
 
   update(): void {

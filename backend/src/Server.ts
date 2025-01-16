@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { app } from "./App";
-import ServerManager from "./ServerManager";
+import ServerManager from "./lib/ServerManager";
 
 export const server = createServer(app);
 
@@ -19,15 +19,6 @@ const io = new Server<
 }); //* pass in custom url possible..
 
 const sManager = new ServerManager();
-
-// // this is the list of the sockets we iterate through to nofity connected users
-// const users: ConnectedUser[] = [];
-
-// // this contains the data about user sprites in game
-// const spritesList: User[] = [];
-
-// // tracks active lobbies
-// const activeLobbies = new Set<string>();
 
 // base connection to the server, from any client
 io.on("connection", (socket) => {
@@ -51,7 +42,8 @@ io.on("connection", (socket) => {
         status: 200,
       });
 
-      const newUserToken: User = {
+      // add it to server list
+      sManager.addUserToSpritesList({
         user_id: msg.username,
         inGame: false,
         position: {
@@ -61,10 +53,7 @@ io.on("connection", (socket) => {
         currentAnimation: undefined,
         currentTexture: undefined,
         flipX: false,
-      };
-
-      // add it to server list
-      sManager.addUserToSpritesList(newUserToken);
+      });
     }
   });
 
@@ -92,8 +81,7 @@ io.on("connection", (socket) => {
     // find the users sprite in the sprite list
     sManager.removeUserFromSpritesList(removedUser.id);
 
-    // only emit the user dc message once both have been removed TODO fix more clean logic
-    io.emit("userDisconnectMsg", { id: removedUser.id }); // sometimes the server fails line 87 and this doesnt get sent out
+    io.emit("userDisconnectMsg", { id: removedUser.id }); // should only get sent if the server can verify the user existed
   });
 
   // handle creating lobbys
@@ -131,36 +119,39 @@ io.on("connection", (socket) => {
       usersInGame: [],
     };
 
+    // lobby exists
     if (sManager.activeLobbies.has(msg.lobbyName)) {
-      socket.join(msg.lobbyName);
+      socket.join(msg.lobbyName); // add user
       thisUser.lobby = msg.lobbyName;
       const spr = sManager.getSpriteByUserID(thisUser.id);
       if (spr === undefined) {
         console.log(
-          "failed to find a user in sprites list with correct id, could be bad",
+          "failed to find a user in sprites list with correct id after verifying user in connected list",
         );
         return;
       }
       socket.to(msg.lobbyName).emit("newUserMsg", { user: spr });
 
+      sManager.populateLobbyResponseEvent(response, thisUser, msg.lobbyName);
+
       // all the users in the current lobby except this socket/user full data
-      // TODO LAZY make all the smanager stuff private
-      const usersInLobby = sManager.connectedUsers.filter((user) =>
-        user.lobby === msg.lobbyName && user.id !== thisUser.id
-      );
 
-      // Get only the ids of users in the lobby
-      const userIds = usersInLobby.map((user) => user.id);
+      // const usersInLobby = sManager.connectedUsers.filter((user) =>
+      //   user.lobby === msg.lobbyName && user.id !== thisUser.id
+      // );
 
-      // get all users in the lobby
-      sManager.spritesList.forEach((spr) => {
-        if (userIds.includes(spr.user_id)) {
-          response.allUsers.push(spr);
-          if (spr.inGame) { // get users also in game but just the ids
-            response.usersInGame.push(spr.user_id);
-          }
-        }
-      });
+      // // Get only the ids of users in the lobby
+      // const userIds = usersInLobby.map((user) => user.id);
+
+      // // get all users in the lobby
+      // sManager.spritesList.forEach((spr) => {
+      //   if (userIds.includes(spr.user_id)) {
+      //     response.allUsers.push(spr);
+      //     if (spr.inGame) { // get users also in game but just the ids
+      //       response.usersInGame.push(spr.user_id);
+      //     }
+      //   }
+      // });
     } else {
       response.status = 404;
       response.joined = false;
@@ -190,31 +181,22 @@ io.on("connection", (socket) => {
     });
   });
 
-  // psuedo for projectiles
-
-  // interface projectile {
-  //   x: number;
-  //   y: number;
-  //   velocity: number;
-  //   lobby: string;
-  // }
-
-  // const projectiles: projectile[] = [];
-
-  // const updateProjectiles = () => {
-  //   projectiles.forEach((projectile) => {
-  //     projectile.x += projectile.velocity / 1000;
-  //     // io.to(projectile.lobby).emit("movingProjectile", projectile);
-  //   });
-  // };
-
-  // setInterval(updateProjectiles, 1);
-
   // end pseudo except lines 215 and 216
   socket.on("fireProjectileEvent", (msg) => {
     console.log("user wants to fire projectile", msg);
-    // projectiles.push(new projectile)
-    // socket emit new projectile event
+    // verify some shit idk
+    // projectiles.push(new projectile) IDK if we even need this 
+    // given that we can properly verify that projectile stuff is valid
+    // thats a bit tricky
+    const user = sManager.getConnectedUserByID(msg.id);
+    if (!user) return;
+    socket.to(user.lobby).emit("newProjectileEvent", {
+      position: {
+        x: msg.position.x,
+        y: msg.position.y,
+      },
+      velocity: msg.velocity,
+    });
   });
 
   // sent when a player returns to the menu
@@ -222,10 +204,10 @@ io.on("connection", (socket) => {
     const user = sManager.getConnectedUserBySocketID(socket.id);
     if (!user) return;
 
-    // thats a function if ive ever seen one
-    const sprIndex = sManager.getSpriteIndexByUserID(user.id);
-    if (sprIndex === -1) return;
-    sManager.spritesList[sprIndex].inGame = false;
+    if (sManager.setUserInGame(false, user.id) == false) {
+      console.log("Failed to find user in spr list to remove from game");
+      return;
+    }
     const { lobby } = user;
     socket.to(lobby).emit("userLeftGameMsg", { id: msg.id });
   });
@@ -235,10 +217,10 @@ io.on("connection", (socket) => {
     const user = sManager.getConnectedUserBySocketID(socket.id);
     if (!user) return;
 
-    //refactor to function
-    const sprIndex = sManager.getSpriteIndexByUserID(user.id);
-    if (sprIndex === -1) return;
-    sManager.spritesList[sprIndex].inGame = true;
+    if (sManager.setUserInGame(true, user.id) == false) {
+      console.log("Failed to find user in spr list to add to game");
+      return;
+    }
 
     const { lobby } = user;
     socket.to(lobby).emit("userJoinedGameMsg", {
