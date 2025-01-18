@@ -51,14 +51,18 @@ socket.on("globalPositionUpdateMsg", (msg) => {
     console.log("update message id is same");
     return;
   }
-  connectionManager.updateUser(msg.id, msg.data, false);
+  connectionManager.setUserMetadata(msg.id, msg.data);
 });
 
 socket.on("userJoinedGameMsg", (msg) => {
   console.log("user join msg", msg);
   connectionManager.addPlayerInGame(msg.id);
-  connectionManager.updateUser(msg.id, msg.texture, true);
-  document.dispatchEvent(new CustomEvent("userJoinedGame", { detail: msg.id }));
+  connectionManager.setUserTexture(msg.id, msg.texture);
+  document.dispatchEvent(
+    new CustomEvent<UserJoinedGameEventDetail>("userJoinedGame", {
+      detail: { id: msg.id },
+    }),
+  );
 });
 
 socket.on("userLeftGameMsg", (msg) => {
@@ -104,14 +108,18 @@ socket.on("lobbyJoinedMsg", (msg) => {
 });
 
 socket.on("newProjectileEvent", (msg) => {
-  document.dispatchEvent(new CustomEvent("createProjectile", { detail: msg }));
+  document.dispatchEvent(
+    new CustomEvent<NewProjectileEventDetail>("createProjectile", {
+      detail: msg,
+    }),
+  );
 });
 
 /**
  * used to ping the server with in game data
  * @param userData standard user object describing data relative to current game state
  */
-export function sendUpdateEvent(userData: User) {
+export function sendUpdateEvent(userData: PlayerMetadata) {
   socket.emit("playerUpdateEvent", userData);
 }
 

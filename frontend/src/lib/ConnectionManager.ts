@@ -1,7 +1,7 @@
 import Opponent from "../prefabs/Opponent";
 
 export default class ConnectionManager {
-  private connectedPlayers: Map<UserID, User>;
+  private connectedPlayers: Map<UserID, PlayerMetadata>;
   private playersInGame: Set<UserID>;
   private spritePool: Array<OtherSprites>;
 
@@ -11,21 +11,38 @@ export default class ConnectionManager {
     this.spritePool = new Array();
   }
 
+  // ADD METHODS
   addPlayerInGame(id: UserID) {
     this.playersInGame.add(id);
   }
 
-  removePlayerInGame(id: UserID) {
-    this.playersInGame.delete(id);
-  }
-
-  hasPlayerInGame(id: UserID): boolean {
-    return this.playersInGame.has(id);
-  }
-
-  addUser(id: UserID, user: User) {
+  addUser(id: UserID, user: PlayerMetadata) {
     if (this.connectedPlayers.has(id)) return;
     this.connectedPlayers.set(id, user);
+  }
+
+  addUserToSpritePool(scene: Phaser.Scene, id: UserID) {
+    if (this.spritePool.find((e) => e.user_id === id)) {
+      console.log("character was already loaded into sprite pool");
+      return;
+    }
+    const data = this.connectedPlayers.get(id);
+    console.log(data);
+    const opp = new Opponent(
+      scene,
+      100,
+      100,
+      "appearing-anim",
+      0,
+      data!.currentTexture as CharacterModel,
+      data!.user_id,
+    );
+    this.spritePool.push({ user_id: id, entity: opp });
+  }
+
+  // REMOVE METHODS
+  removePlayerInGame(id: UserID) {
+    this.playersInGame.delete(id);
   }
 
   removeAllUsers() {
@@ -34,8 +51,7 @@ export default class ConnectionManager {
     });
     this.playersInGame.clear();
   }
-  
-  
+
   removeUser(id: UserID): void {
     if (this.connectedPlayers.delete(id) === false) {
       console.log(
@@ -45,6 +61,27 @@ export default class ConnectionManager {
     }
     console.log(`removed player ${id} from connected users list`);
     this.removeUserFromSpritePool(id);
+  }
+
+  removeUserFromSpritePool(id: UserID) {
+    const spriteToRemoveIndex = this.spritePool.findIndex((sprite) =>
+      sprite.user_id === id
+    );
+    if (spriteToRemoveIndex === -1) {
+      console.log(
+        "attempting to remove a sprite from the pool that does not exist",
+      );
+      return;
+    }
+    const sprite = this.spritePool.splice(spriteToRemoveIndex, 1);
+
+    sprite[0].entity.removeFromScene();
+  }
+
+  // MISC / HELPERS
+
+  hasPlayerInGame(id: UserID): boolean {
+    return this.playersInGame.has(id);
   }
 
   /**
@@ -67,23 +104,21 @@ export default class ConnectionManager {
   }
 
   // check user in map and update TODO this might have bricked shit
-  updateUser(
+  setUserMetadata(
     id: UserID,
-    _data: User | string,
-    texture: boolean,
+    data: PlayerMetadata,
   ): void {
     if (this.connectedPlayers.has(id) === false) return;
-    if (texture === false) {
-      this.connectedPlayers.set(id, _data as User);
-    } else {
-      const updateMe = this.connectedPlayers.get(id)!;
-      if (!updateMe.currentTexture) {
-        updateMe["currentTexture"] = _data as CharacterModel;
-      } else {
-        updateMe!.currentTexture = _data as CharacterModel;
-      }
-      this.connectedPlayers.set(id, updateMe);
+    this.connectedPlayers.set(id, data as PlayerMetadata);
+  }
+
+  setUserTexture(id: UserID, texture: string) {
+    if (this.connectedPlayers.has(id) === false) {
+      return;
     }
+    const updateMe = this.connectedPlayers.get(id)!;
+    updateMe.currentTexture = texture;
+    this.connectedPlayers.set(id, updateMe);
   }
 
   clearAllUsersFromSpritePool(): void {
@@ -93,41 +128,9 @@ export default class ConnectionManager {
     }
     this.spritePool = new Array();
   }
-  getSpritePool(){
-    return this.spritePool
-  }
-  removeUserFromSpritePool(id: UserID) {
-    const spriteToRemoveIndex = this.spritePool.findIndex((sprite) =>
-      sprite.user_id === id
-    );
-    if (spriteToRemoveIndex === -1) {
-      console.log(
-        "attempting to remove a sprite from the pool that does not exist",
-      );
-      return;
-    }
-    const sprite = this.spritePool.splice(spriteToRemoveIndex, 1);
 
-    sprite[0].entity.removeFromScene();
-  }
-
-  addUserToSpritePool(scene: Phaser.Scene, id: UserID) {
-    if (this.spritePool.find((e) => e.user_id === id)) {
-      console.log("character was already loaded into sprite pool");
-      return;
-    }
-    const data = this.connectedPlayers.get(id);
-    console.log(data);
-    const opp = new Opponent(
-      scene,
-      100,
-      100,
-      "appearing-anim",
-      0,
-      data!.currentTexture as CharacterModel,
-      data!.user_id,
-    );
-    this.spritePool.push({ user_id: id, entity: opp });
+  getSpritePool() {
+    return this.spritePool;
   }
 
   updateSpritePoolGameState(): void {
@@ -146,7 +149,6 @@ export default class ConnectionManager {
       spr.entity.setY(yPos);
 
       if (
-        // are you serious cj what a fucking joke
         currentTexture?.includes("-jump") ||
         currentTexture?.includes("-fall")
       ) {

@@ -8,8 +8,14 @@ export default class Play extends Phaser.Scene {
   private playScreen!: Phaser.GameObjects.TileSprite;
   private selectedCharModel: CharacterModel = "player01";
 
-  private userJoinedGameListener: (e: CustomEvent) => void;
-  private createProjectileListener: (e: CustomEvent) => void;
+  private userJoinedGameListener: (
+    e: CustomEvent<UserJoinedGameEventDetail>,
+  ) => void;
+  private createProjectileListener: (
+    e: CustomEvent<NewProjectileEventDetail>,
+  ) => void;
+
+  private TILE_SCROLL_RATE = 0.75
   constructor() {
     super({ key: "playScene" });
 
@@ -21,14 +27,14 @@ export default class Play extends Phaser.Scene {
           e.detail,
           " to the spritepool",
         );
-        connectionManager.addUserToSpritePool(this, e.detail);
+        connectionManager.addUserToSpritePool(this, e.detail.id);
       }
     };
 
     this.createProjectileListener = (e) => {
       if (this.scene.isActive("playScene")) {
         console.log("incoming projectile!");
-        this.events.emit("makeProj", e);
+        this.events.emit("createProjectile", e);
       }
     };
 
@@ -117,25 +123,28 @@ export default class Play extends Phaser.Scene {
         },
       );
 
-    this.events.on("makeProj", (e: CustomEvent) => {
-      const p = new Projectile(
-        this,
-        e.detail.position.x,
-        e.detail.position.y,
-        `star-${Phaser.Math.Between(1, 6)}`,
-        0,
-        e.detail.velocity,
-      );
+    this.events.on(
+      "createProjectile",
+      (e: CustomEvent<NewProjectileEventDetail>) => {
+        const p = new Projectile(
+          this,
+          e.detail.position.x,
+          e.detail.position.y,
+          `star-${Phaser.Math.Between(1, 6)}`,
+          0,
+          e.detail.velocity,
+        );
 
-      this.physics.add.collider(this.player, p, () => {
-        this.player.takeHit();
-        p.destroy();
-      });
-    });
+        this.physics.add.collider(this.player, p, () => {
+          this.player.takeHit();
+          p.destroy();
+        });
+      },
+    );
   }
 
   update(): void {
-    this.playScreen.tilePositionY += 0.75;
+    this.playScreen.tilePositionY += this.TILE_SCROLL_RATE;
     if (this.player.active) {
       this.player.update();
     }

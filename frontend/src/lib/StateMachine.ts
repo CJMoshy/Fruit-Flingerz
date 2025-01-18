@@ -54,10 +54,9 @@ export default class StateMachine {
 export abstract class State {
   stateMachine!: StateMachine;
 
-  enter(...args: any) {
-    // this code happens *once* when we enter the state
-  }
-  execute(...args: any) {
-    // this code happens each update step (ie every frame)
-  }
+  // this code happens *once* when we enter the state
+  abstract enter(...args: any): void;
+
+  // this code happens each update step (ie every frame)
+  abstract execute(...args: any): void;
 }

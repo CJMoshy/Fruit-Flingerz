@@ -236,6 +236,7 @@ class shootState extends State {
     connectionManager.getSpritePool().forEach((spr) => {
       scene.physics.add.overlap(spr.entity, p, () => p.destroy());
     });
+
     sendProjectileEvent({
       id: player.userName,
       position: {
@@ -245,5 +246,9 @@ class shootState extends State {
       velocity: 500 * (player.flipX ? -1 : 1),
     });
     this.stateMachine.transition("idle");
+  }
+
+  override execute() {
+    // no implementation needed
   }
 }

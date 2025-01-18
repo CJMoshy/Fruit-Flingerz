@@ -1,6 +1,6 @@
 type UserID = string;
 
-interface User {
+interface PlayerMetadata {
   user_id: UserID;
   inGame: boolean;
   position: {
@@ -40,12 +40,12 @@ interface CreateLobbyResponseMsg extends Message {
 
 interface JoinLobbyResponseMessage extends Message {
   joined: boolean;
-  allUsers: User[];
+  allUsers: PlayerMetadata[];
   usersInGame: UserID[];
 }
 
 interface NewUserMessage extends Message {
-  user: User;
+  user: PlayerMetadata;
 }
 
 interface UserDCMessage extends Message {
@@ -57,9 +57,13 @@ interface UserJoinedGameMsg extends Message {
   texture: string;
 }
 
+interface UserJoinedGameEventDetail {
+  id: UserID;
+}
+
 interface GlobalPositionUpdateMsg extends Message {
   id: UserID;
-  data: User; // FIX THIS MAKE DATA TYPE AND PASS THAT
+  data: PlayerMetadata; // FIX THIS MAKE DATA TYPE AND PASS THAT
 }
 
 interface FireProjectileMsg extends Message {
@@ -79,6 +83,13 @@ interface NewProjectileMsg extends Message {
   velocity: number;
 }
 
+interface NewProjectileEventDetail {
+  position: {
+    x: number;
+    y: number;
+  };
+  velocity: number;
+}
 interface ServerToClientEvents {
   newUserMsg: (msg: NewUserMessage) => void;
   lobbyCreatedMsg: (msg: CreateLobbyResponseMsg) => void;
@@ -95,7 +106,7 @@ interface ClientToServerEvents {
   loginMsg: (msg: loginMsg) => void;
   createLobbyEvent: (msg: CreateLobbyMessage) => void;
   joinLobbyEvent: (msg: JoinLobbyMessage) => void;
-  playerUpdateEvent: (msg: User) => void;
+  playerUpdateEvent: (msg: PlayerMetadata) => void;
   playerLeftGameEvent: (msg: UserDCMessage) => void;
   playerJoinedGameEvent: (msg: UserJoinedGameMsg) => void;
   fireProjectileEvent: (msg: FireProjectileMsg) => void;

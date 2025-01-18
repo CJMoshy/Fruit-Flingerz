@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc --watch",
-    "start": "nodemon ./dist/Server.js"
+    "start": "nodemon ./dist/Server/Server.js"
   },
   "keywords": [],
   "author": "",

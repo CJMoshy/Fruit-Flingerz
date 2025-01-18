@@ -6,7 +6,7 @@ interface ConnectedUser {
 
 type UserID = string;
 
-interface User {
+interface PlayerMetadata {
   user_id: UserID;
   inGame: boolean;
   position: {
@@ -41,12 +41,12 @@ interface CreateLobbyResponseMsg extends Message {
 
 interface JoinLobbyResponseMessage extends Message {
   joined: boolean;
-  allUsers: User[];
+  allUsers: PlayerMetadata[];
   usersInGame: UserID[];
 }
 
 interface NewUserMessage extends Message {
-  user: User;
+  user: PlayerMetadata;
 }
 
 interface UserDCMessage extends Message {
@@ -60,7 +60,7 @@ interface UserJoinedGameMsg extends Message {
 
 interface GlobalPositionUpdateMsg extends Message {
   id: UserID;
-  data: User; // FIX THIS MAKE DATA TYPE AND PASS THAT
+  data: PlayerMetadata;
 }
 
 interface FireProjectileMsg extends Message {
@@ -96,7 +96,7 @@ interface ClientToServerEvents {
   loginMsg: (msg: LoginMesssage) => void;
   createLobbyEvent: (msg: CreateLobbyMessage) => void;
   joinLobbyEvent: (msg: JoinLobbyMessage) => void;
-  playerUpdateEvent: (msg: User) => void;
+  playerUpdateEvent: (msg: PlayerMetadata) => void;
   playerLeftGameEvent: (msg: UserDCMessage) => void;
   playerJoinedGameEvent: (msg: UserJoinedGameMsg) => void;
   fireProjectileEvent: (msg: FireProjectileMsg) => void;

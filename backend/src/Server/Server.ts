@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { createServer } from "http";
 import { app } from "./App";
-import ServerManager from "./lib/ServerManager";
+import ServerManager from "../lib/ServerManager";
 
 export const server = createServer(app);
 
@@ -25,7 +25,7 @@ io.on("connection", (socket) => {
   // listen for specific message types from the client
   socket.on("loginMsg", (msg) => {
     // check if a user with the same username already exists in the list of current users
-    if (sManager.checkConnectedUserExist(msg.username) !== undefined) {
+    if (sManager.getConnectedUserByID(msg.username) !== undefined) {
       console.log("A user tried to join that already exists");
       socket.emit("loginResponseMsg", {
         status: 409,
@@ -61,27 +61,25 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("socket disconnected from server", socket.id);
     // find the user in the socket list
-    const userToDisconnectIndex = sManager.getConnectedUserBySocketID(
+    const userToDisconnect = sManager.getConnectedUserBySocketID(
       socket.id,
     );
 
     // prob dont need this
-    if (userToDisconnectIndex === undefined) {
+    if (userToDisconnect === undefined) {
       console.log(
         "failed to find user in connected users arr with socket that just disconnected from server",
       );
       return;
-    } // end
+    }
 
-    const removedUser = sManager.removeConnectedUser(userToDisconnectIndex.id);
-
-    if (!removedUser) {
+    if (sManager.removeConnectedUser(userToDisconnect.id) === undefined) {
       return;
     }
     // find the users sprite in the sprite list
-    sManager.removeUserFromSpritesList(removedUser.id);
+    sManager.removeUserFromSpritesList(userToDisconnect.id);
 
-    io.emit("userDisconnectMsg", { id: removedUser.id }); // should only get sent if the server can verify the user existed
+    io.emit("userDisconnectMsg", { id: userToDisconnect.id }); // should only get sent if the server can verify the user existed
   });
 
   // handle creating lobbys
@@ -133,25 +131,6 @@ io.on("connection", (socket) => {
       socket.to(msg.lobbyName).emit("newUserMsg", { user: spr });
 
       sManager.populateLobbyResponseEvent(response, thisUser, msg.lobbyName);
-
-      // all the users in the current lobby except this socket/user full data
-
-      // const usersInLobby = sManager.connectedUsers.filter((user) =>
-      //   user.lobby === msg.lobbyName && user.id !== thisUser.id
-      // );
-
-      // // Get only the ids of users in the lobby
-      // const userIds = usersInLobby.map((user) => user.id);
-
-      // // get all users in the lobby
-      // sManager.spritesList.forEach((spr) => {
-      //   if (userIds.includes(spr.user_id)) {
-      //     response.allUsers.push(spr);
-      //     if (spr.inGame) { // get users also in game but just the ids
-      //       response.usersInGame.push(spr.user_id);
-      //     }
-      //   }
-      // });
     } else {
       response.status = 404;
       response.joined = false;
@@ -168,11 +147,10 @@ io.on("connection", (socket) => {
     const user = sManager.getConnectedUserBySocketID(socket.id);
     if (!user) return;
     const { lobby } = user;
-    // end func
 
     const usr = sManager.getSpriteByUserID(user.id);
     if (usr === undefined) {
-      console.log("failed to fina sprite in sprites list given id", user.id);
+      console.log("failed to find sprite in sprites list given id", user.id);
       return;
     }
     socket.to(lobby).emit("globalPositionUpdateMsg", {
@@ -184,12 +162,10 @@ io.on("connection", (socket) => {
   // end pseudo except lines 215 and 216
   socket.on("fireProjectileEvent", (msg) => {
     console.log("user wants to fire projectile", msg);
-    // verify some shit idk
-    // projectiles.push(new projectile) IDK if we even need this 
-    // given that we can properly verify that projectile stuff is valid
-    // thats a bit tricky
+    // given that we can properly verify that projectile stuff is valid then allow below to execute
     const user = sManager.getConnectedUserByID(msg.id);
     if (!user) return;
+
     socket.to(user.lobby).emit("newProjectileEvent", {
       position: {
         x: msg.position.x,

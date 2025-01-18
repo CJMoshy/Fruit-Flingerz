@@ -1,23 +1,24 @@
-import { Server } from "socket.io";
 export default class ServerManager {
-    //figure out these two later
     private connectedUsers: ConnectedUser[];
-    private spritesList: User[];
+    private spritesList: PlayerMetadata[];
     public activeLobbies: Set<string>;
-
-    private activeProjectiles: Projectile[];
 
     constructor() {
         this.connectedUsers = [];
         this.spritesList = [];
         this.activeLobbies = new Set();
-        this.activeProjectiles = [];
     }
 
+    // ADD METHODS
     addConnectedUser(cu: ConnectedUser) {
         this.connectedUsers.push(cu);
     }
 
+    addUserToSpritesList(user: PlayerMetadata) {
+        this.spritesList.push(user);
+    }
+
+    // REMOVE METHODS
     removeConnectedUser(uid: UserID) {
         const index = this.connectedUsers.findIndex((user) => user.id === uid);
         if (index === -1) {
@@ -29,12 +30,22 @@ export default class ServerManager {
         return this.connectedUsers.splice(index, 1)[0];
     }
 
-    checkConnectedUserExist(uID: UserID) {
-        return this.connectedUsers.find((user) => user.id === uID);
+    removeUserFromSpritesList(uid: UserID) {
+        const index = this.spritesList.findIndex((user) =>
+            user.user_id === uid
+        );
+        if (index === -1) {
+            console.log(
+                `failed to find a user id:${uid} in the spritesList array`,
+            );
+            return;
+        }
+        this.spritesList.splice(index, 1);
     }
 
-    getConnectedUserIndexByID(uID: UserID) {
-        return this.connectedUsers.findIndex((user) => user.id === uID);
+    // GETTERS
+    getConnectedUserIndexByID(uid: UserID) {
+        return this.connectedUsers.findIndex((user) => user.id === uid);
     }
 
     getConnectedUserIndexBySocketID(socketID: string) {
@@ -43,19 +54,28 @@ export default class ServerManager {
         );
     }
 
-    getConnectedUserByID(uID: UserID) {
-        return this.connectedUsers.find((user) => user.id === uID);
+    getConnectedUserByID(uid: UserID) {
+        return this.connectedUsers.find((user) => user.id === uid);
     }
 
     getConnectedUserBySocketID(socketID: string) {
         return this.connectedUsers.find((user) => user.socket.id === socketID);
     }
 
-    addUserToSpritesList(user: User) {
-        this.spritesList.push(user);
+    getSpriteByUserID(uid: UserID) {
+        return this.spritesList.find((spr) => spr.user_id === uid);
     }
 
-    updateSpriteInList(usr: User) {
+    getSpriteIndexByUserID(uid: UserID) {
+        return this.spritesList.findIndex((spr) => spr.user_id === uid);
+    }
+
+    // MISC / HELPERS
+
+    /**
+     * @param usr user type data to update
+     */
+    updateSpriteInList(usr: PlayerMetadata) {
         const index = this.spritesList.findIndex((e) =>
             e.user_id === usr.user_id
         );
@@ -67,64 +87,43 @@ export default class ServerManager {
         this.spritesList[index].currentTexture = usr.currentTexture;
         this.spritesList[index].flipX = usr.flipX;
     }
-    getSpriteByUserID(uID: UserID) {
-        return this.spritesList.find((spr) => spr.user_id === uID);
-    }
-    getSpriteIndexByUserID(uID: UserID) {
-        return this.spritesList.findIndex((spr) => spr.user_id === uID);
-    }
-    removeUserFromSpritesList(uID: UserID) {
-        const index = this.spritesList.findIndex((user) =>
-            user.user_id === uID
-        );
-        if (index === -1) {
-            console.log(
-                `failed to find a user id:${uID} in the spritesList array`,
-            );
-            return;
-        }
-        this.spritesList.splice(index, 1);
-    }
-    
-    setUserInGame(inGame: boolean, uID: UserID): boolean{
-        const sprIndex = this.getSpriteIndexByUserID(uID);
+
+    /**
+     * Used to toggle user in game status, indicating whether or not the user is in the game and not just lobby.
+     * Returns true upon successful update of player data else false
+     * @param inGame boolean indicating whether or not user is in game
+     * @param uid users id to search for
+     */
+    setUserInGame(inGame: boolean, uid: UserID): boolean {
+        const sprIndex = this.getSpriteIndexByUserID(uid);
         if (sprIndex === -1) return false;
         this.spritesList[sprIndex].inGame = inGame;
         return true;
     }
 
+    /**
+     * @param msg type that holds a list of all users in the lobby and the users currently in the game
+     * @param _user connected user type holding user id needed
+     * @param lobbyName name of the lobby to query for users in
+     */
     populateLobbyResponseEvent(
         msg: JoinLobbyResponseMessage,
         _user: ConnectedUser,
         lobbyName: string,
     ) {
-        const usersInLobby = this.connectedUsers.filter((user) =>
+        // get the ids of the users in the lobby
+        const userIds = this.connectedUsers.filter((user) =>
             user.lobby === lobbyName && user.id !== _user.id
-        );
+        ).map((user) => user.id);
 
-        // Get only the ids of users in the lobby
-        const userIds = usersInLobby.map((user) => user.id);
-
-        // get all users in the lobby
+        // go through all the connected players char data
         this.spritesList.forEach((spr) => {
-            if (userIds.includes(spr.user_id)) {
+            if (userIds.includes(spr.user_id)) { // find the ones in the lobby
                 msg.allUsers.push(spr);
-                if (spr.inGame) { // get users also in game but just the ids
+                if (spr.inGame) { // get users also in game by id
                     msg.usersInGame.push(spr.user_id);
                 }
             }
         });
-    }
-
-    addProjectile(p: Projectile) {
-        this.activeProjectiles.push(p);
-    }
-
-    updateProjectiles(io: Server) { // io here is socket.io main emitter
-        // phaser uses a pps (pixels per second) abstraction for velocity so move the x forward by velocity / 1000
-        // this of course assumes this method will be called every 1ms
-        this.activeProjectiles.forEach((p) => p.x += p.velocity / 1000);
-        // io.to(p.lobby).emit('movingProjectileEvent', p)
-        // client side we need to catch this and then iterate through the list of projectiles in the lobby, find the ID and update the x val
     }
 }
