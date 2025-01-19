@@ -45,6 +45,15 @@ import star4 from "../assets/img/star/star4.png";
 import star5 from "../assets/img/star/star5.png";
 import star6 from "../assets/img/star/star6.png";
 
+import apple from "../assets/spritesheets/fruits/Apple.png";
+import bananas from "../assets/spritesheets/fruits/Bananas.png";
+import cherries from "../assets/spritesheets/fruits/cherries.png";
+import kiwi from "../assets/spritesheets/fruits/Kiwi.png";
+import melon from "../assets/spritesheets/fruits/Melon.png";
+import orange from "../assets/spritesheets/fruits/Orange.png";
+import pineapple from "../assets/spritesheets/fruits/Pineapple.png";
+import strawberry from "../assets/spritesheets/fruits/Strawberry.png";
+
 export default class Loader extends Phaser.Scene {
   constructor() {
     super({ key: "loaderScene" });
@@ -149,6 +158,48 @@ export default class Loader extends Phaser.Scene {
       frameHeight: 32,
     });
     this.load.spritesheet("player-04-dbJmp", player4dbJmp, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    //fruits
+
+    this.load.spritesheet("apple", apple, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    this.load.spritesheet("bananas", bananas, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    this.load.spritesheet("cherries", cherries, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    this.load.spritesheet("kiwi", kiwi, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    this.load.spritesheet("melon", melon, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    this.load.spritesheet("orange", orange, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    this.load.spritesheet("pineapple", pineapple, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+
+    this.load.spritesheet("strawberry", strawberry, {
       frameWidth: 32,
       frameHeight: 32,
     });

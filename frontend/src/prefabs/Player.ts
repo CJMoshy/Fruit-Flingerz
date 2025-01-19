@@ -22,7 +22,7 @@ export default class Player extends Entity {
   parentScene: Phaser.Scene;
 
   private metadataPingId: number;
-  private metadataPingInterval = 20; // ping the server every 25ms (40 ping/second)
+  private metadataPingInterval = 20; // ping the server every 20ms (50 ping/second)
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -81,8 +81,12 @@ export default class Player extends Entity {
   }
 
   takeHit() {
-    this.hitPoints -= 1;
-    console.log(this.hitPoints);
+    if (this.hitPoints <= 0) {
+      console.log("player is eliminated");
+    } else {
+      this.hitPoints -= 1;
+      console.log(this.hitPoints);
+    }
   }
 
   returnToMenu() {

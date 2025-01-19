@@ -28,10 +28,12 @@ export default class Lobby extends Phaser.Scene {
         this.lobbySuccessListener,
       );
     });
+
     let lobbyName = "";
+
     this.createLobbyInput = this.add.dom(
       this.sys.canvas.width / 2,
-      this.sys.canvas.height / 2,
+      this.sys.canvas.height / 4 + 25,
       "input",
       "width: 220px; height: 50px;",
     );
@@ -42,10 +44,10 @@ export default class Lobby extends Phaser.Scene {
 
     this.createLobbySubmit = this.add.dom(
       this.sys.canvas.width / 2,
-      this.sys.canvas.height / 2 + 100,
+      this.sys.canvas.height / 4 + 100,
       "button",
-      "width: 100px; height: 45px; font: 16px Arial",
-      "create",
+      "width: 200px; height: 45px; font: 16px Arial",
+      "create lobby",
     );
     this.createLobbySubmit.addListener("click");
     this.createLobbySubmit.on("click", () => {
@@ -61,7 +63,7 @@ export default class Lobby extends Phaser.Scene {
     let joinLobbyName = "";
     this.joinLobbyInput = this.add.dom(
       this.sys.canvas.width / 2,
-      this.sys.canvas.height / 2 + 200,
+      this.sys.canvas.height / 2 + 100,
       "input",
       "width: 220px; height: 50px;",
     );
@@ -72,14 +74,73 @@ export default class Lobby extends Phaser.Scene {
 
     this.joinLobbySubmit = this.add.dom(
       this.sys.canvas.width / 2,
-      this.sys.canvas.height / 2 + 300,
+      this.sys.canvas.height / 2 + 175,
       "button",
-      "width: 100px; height: 45px; font: 16px Arial",
-      "join",
+      "width: 200px; height: 45px; font: 16px Arial",
+      "join lobby",
     );
     this.joinLobbySubmit.addListener("click");
     this.joinLobbySubmit.on("click", () => {
+      if (joinLobbyName === "") {
+        alert("Enter a lobby name");
+        return;
+      }
       joinLobby(joinLobbyName);
     });
+
+    this.physics.world.setBounds(
+      0,
+      -100,
+      this.sys.canvas.width,
+      this.sys.canvas.height + 100,
+    );
+    this.fruitMadness();
+    this.time.addEvent({
+      loop: true,
+      callback: () => this.fruitMadness(),
+      delay: Phaser.Math.Between(9, 12) * 1000,
+    });
+  }
+
+  fruitMadness() {
+    const fadeOut = (toFade: Phaser.Physics.Arcade.Sprite) => {
+      this.tweens.add({
+        targets: toFade,
+        alpha: 0,
+        duration: 1500,
+        ease: "Bounce.easeOut",
+        onComplete: () => {
+          toFade.destroy();
+        },
+      });
+    };
+
+    const fruits = [
+      "apple",
+      "bananas",
+      "kiwi",
+      "cherries",
+      "orange",
+      "melon",
+      "pineapple",
+      "strawberry",
+    ];
+
+    for (let i = 0; i < 20; i++) {
+      const x = this.physics.add.sprite(
+        Phaser.Math.Between(50, this.sys.canvas.width - 50),
+        -100,
+        fruits[Phaser.Math.Between(0, fruits.length - 1)],
+        0,
+      ).setScale(2)
+        .setGravityY(Phaser.Math.Between(200, 350))
+        .setCollideWorldBounds().setBounce(
+          0.85,
+        );
+
+      setTimeout(() => {
+        fadeOut(x);
+      }, Phaser.Math.Between(10, 15) * 1000);
+    }
   }
 }
