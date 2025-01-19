@@ -21,6 +21,8 @@ export default class Player extends Entity {
   FSM: StateMachine;
   parentScene: Phaser.Scene;
 
+  private metadataPingId: number;
+  private metadataPingInterval = 20; // ping the server every 25ms (40 ping/second)
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -58,12 +60,31 @@ export default class Player extends Entity {
     }, [scene, this]);
 
     joinScene(this.userName, texture);
+
+    this.metadataPingId = setInterval(() => {
+      sendUpdateEvent({
+        user_id: loginMsg.username,
+        inGame: true,
+        position: {
+          x: this.x,
+          y: this.y,
+        },
+        currentAnimation: this.anims.currentAnim?.toJSON().key, // potential problem
+        currentTexture: this.texture.key,
+        flipX: this.flipX,
+      });
+    }, this.metadataPingInterval);
+
+    this.on("destroy", () => {
+      clearInterval(this.metadataPingId);
+    });
   }
 
   takeHit() {
     this.hitPoints -= 1;
     console.log(this.hitPoints);
   }
+
   returnToMenu() {
     this.anims.play("disappearing-anim").on(
       "animationcomplete",
@@ -78,19 +99,6 @@ export default class Player extends Entity {
 
   override update(): void {
     super.update();
-    // this is the next problem. Emitting an event/ping to the server every update tick just seems nasty
-    sendUpdateEvent({
-      user_id: loginMsg.username,
-      inGame: true,
-      position: {
-        x: this.x,
-        y: this.y,
-      },
-      currentAnimation: this.anims.currentAnim?.toJSON().key, // potential problem
-      currentTexture: this.texture.key,
-      flipX: this.flipX,
-    });
-    // end problem
     this.FSM.step();
     this.determineTexture();
   }
