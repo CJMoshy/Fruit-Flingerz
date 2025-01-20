@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { createServer } from "http";
+import { createServer } from "node:http";
 import { app } from "./App";
 import ServerManager from "../lib/ServerManager";
 
@@ -78,6 +78,10 @@ io.on("connection", (socket) => {
     }
     // find the users sprite in the sprite list
     sManager.removeUserFromSpritesList(userToDisconnect.id);
+    sManager.removePlayerFromLobbyElimTracker(
+      userToDisconnect.lobby,
+      userToDisconnect.id,
+    );
 
     io.emit("userDisconnectMsg", { id: userToDisconnect.id }); // should only get sent if the server can verify the user existed
   });
@@ -100,6 +104,7 @@ io.on("connection", (socket) => {
       sManager.activeLobbies.add(msg.lobbyName);
       socket.join(msg.lobbyName); // connect requester
       user.lobby = msg.lobbyName;
+      sManager.registerLobbyToElimTracker(msg.lobbyName);
     }
 
     socket.emit("lobbyCreatedMsg", response);
@@ -131,6 +136,7 @@ io.on("connection", (socket) => {
       socket.to(msg.lobbyName).emit("newUserMsg", { user: spr });
 
       sManager.populateLobbyResponseEvent(response, thisUser, msg.lobbyName);
+      sManager.addPlayerToLobbyElimTracker(msg.lobbyName, thisUser.id);
     } else {
       response.status = 404;
       response.joined = false;
@@ -161,18 +167,11 @@ io.on("connection", (socket) => {
 
   // end pseudo except lines 215 and 216
   socket.on("fireProjectileEvent", (msg) => {
-    console.log("user wants to fire projectile", msg);
     // given that we can properly verify that projectile stuff is valid then allow below to execute
     const user = sManager.getConnectedUserByID(msg.id);
     if (!user) return;
 
-    socket.to(user.lobby).emit("newProjectileEvent", {
-      position: {
-        x: msg.position.x,
-        y: msg.position.y,
-      },
-      velocity: msg.velocity,
-    });
+    socket.to(user.lobby).emit("newProjectileEvent", msg);
   });
 
   // sent when a player returns to the menu
@@ -203,5 +202,23 @@ io.on("connection", (socket) => {
       id: msg.id,
       texture: msg.texture,
     });
+  });
+
+  socket.on("playerEliminatedEvent", (msg) => {
+    const eliminatedPlayer = sManager.getConnectedUserBySocketID(socket.id);
+    const terminator = sManager.getConnectedUserByID(msg.byWho);
+    if (eliminatedPlayer === undefined || terminator === undefined) {
+      console.log("might have a hacker or something");
+      return;
+    }
+    console.log(
+      terminator,
+      "just eliminated",
+      eliminatedPlayer,
+    );
+    sManager.updatePlayersElimCount(terminator.lobby, terminator.id); // can be written better
+    const leader = sManager.getElimLeader(terminator.lobby);
+    if (!leader) return;
+    io.to(terminator.lobby).emit("elimLeaderEvent", { leader: leader });
   });
 });

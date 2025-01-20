@@ -2,11 +2,13 @@ export default class ServerManager {
     private connectedUsers: ConnectedUser[];
     private spritesList: PlayerMetadata[];
     public activeLobbies: Set<string>;
+    private elimTracker: Map<string, Map<UserID, number>>;
 
     constructor() {
         this.connectedUsers = [];
         this.spritesList = [];
         this.activeLobbies = new Set();
+        this.elimTracker = new Map();
     }
 
     // ADD METHODS
@@ -125,5 +127,95 @@ export default class ServerManager {
                 }
             }
         });
+    }
+
+    registerLobbyToElimTracker(lobbyName: string) {
+        if (this.elimTracker.has(lobbyName)) {
+            console.log(
+                "tring to register a lobby to elim tracker that is already registered",
+            );
+            return;
+        }
+        const players = this.connectedUsers.filter((user) =>
+            user.lobby === lobbyName
+        ).map((user) => [user.id, 0]);
+        console.log(players);
+        const playerStats = new Map();
+        for (const [key, value] of players) {
+            playerStats.set(key, value);
+        }
+        this.elimTracker.set(lobbyName, playerStats);
+    }
+
+    addPlayerToLobbyElimTracker(lobbyName: string, uid: UserID) {
+        if (this.elimTracker.has(lobbyName) == false) {
+            console.log(
+                "trying to find lobby in elim tracker that does not exist",
+            );
+            return;
+        }
+        const map = this.elimTracker.get(lobbyName)!;
+        if (map?.has(uid)) {
+            console.log(
+                "trying to register a player to the elim tracker map that already existed in the lobby",
+            );
+            return;
+        }
+        map.set(uid, 0);
+    }
+
+    removePlayerFromLobbyElimTracker(lobbyName: string, uid: UserID) {
+        if (this.elimTracker.has(lobbyName) == false) {
+            console.log(
+                "trying to find lobby in elim tracker that does not exist",
+            );
+            return;
+        }
+        const map = this.elimTracker.get(lobbyName)!;
+        if (map?.has(uid) === false) {
+            console.log(
+                `failed to find a player ${uid} to remove from the elim tracker`,
+            );
+            return;
+        }
+        map.delete(uid);
+    }
+
+    updatePlayersElimCount(lobbyName: string, uid: UserID) {
+        if (this.elimTracker.has(lobbyName) == false) {
+            console.log(
+                "trying to find lobby in elim tracker that does not exist",
+            );
+            return;
+        }
+        const map = this.elimTracker.get(lobbyName)!;
+        if (map?.has(uid) === false) {
+            console.log(
+                "failed to find a player in elim tracker with name",
+                uid,
+            );
+            return;
+        }
+        map.set(uid, map.get(uid)! + 1);
+
+        console.log(map);
+    }
+
+    getElimLeader(lobbyName: string) {
+        if (this.elimTracker.has(lobbyName) == false) {
+            console.log(
+                "trying to find lobby in elim tracker that does not exist",
+            );
+            return;
+        }
+        let maxElims = 0;
+        let leader = "";
+        for (const [key, value] of this.elimTracker.get(lobbyName)!) {
+            if (value > maxElims) {
+                maxElims = value;
+                leader = key;
+            }
+        }
+        return leader;
     }
 }

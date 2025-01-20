@@ -7,15 +7,19 @@ export default class Play extends Phaser.Scene {
   private player!: Player;
   private playScreen!: Phaser.GameObjects.TileSprite;
   private selectedCharModel: CharacterModel = "player01";
+  private elimLeaderText!: Phaser.GameObjects.Text;
 
   private userJoinedGameListener: (
     e: CustomEvent<UserJoinedGameEventDetail>,
   ) => void;
   private createProjectileListener: (
-    e: CustomEvent<NewProjectileEventDetail>,
+    e: CustomEvent<FireProjectileMsg>,
+  ) => void;
+  private elimLeaderListener: (
+    e: CustomEvent<ElimLeaderMsg>,
   ) => void;
 
-  private TILE_SCROLL_RATE = 0.75
+  private TILE_SCROLL_RATE = 0.75;
   constructor() {
     super({ key: "playScene" });
 
@@ -33,8 +37,13 @@ export default class Play extends Phaser.Scene {
 
     this.createProjectileListener = (e) => {
       if (this.scene.isActive("playScene")) {
-        console.log("incoming projectile!");
         this.events.emit("createProjectile", e);
+      }
+    };
+
+    this.elimLeaderListener = (e) => {
+      if (this.scene.isActive("playScene")) {
+        this.elimLeaderText.setText(`Current Leader: ${e.detail.leader}`);
       }
     };
 
@@ -46,6 +55,11 @@ export default class Play extends Phaser.Scene {
     document.addEventListener(
       "createProjectile",
       this.createProjectileListener as EventListener,
+    );
+
+    document.addEventListener(
+      "elimLeader",
+      this.elimLeaderListener as EventListener,
     );
   }
 
@@ -68,6 +82,11 @@ export default class Play extends Phaser.Scene {
         "createProjectile",
         this.createProjectileListener as EventListener,
       );
+
+      document.removeEventListener(
+        "elimLeader",
+        this.elimLeaderListener as EventListener,
+      );
     });
     //load backgorund
     if (this.textures.exists("BG-purple")) {
@@ -89,6 +108,12 @@ export default class Play extends Phaser.Scene {
       tileset,
     ) as Phaser.Tilemaps.TilemapLayer;
     collisionLayer.setCollisionByProperty({ collides: true });
+
+    this.elimLeaderText = this.add.text(
+      this.sys.canvas.width / 2,
+      25,
+      "Current Leader: ",
+    ).setOrigin(0.5);
 
     //spawn player
     this.player = new Player(
@@ -125,18 +150,20 @@ export default class Play extends Phaser.Scene {
 
     this.events.on(
       "createProjectile",
-      (e: CustomEvent<NewProjectileEventDetail>) => {
+      (e: CustomEvent<FireProjectileMsg>) => {
         const p = new Projectile(
           this,
           e.detail.position.x,
           e.detail.position.y,
           `star-${Phaser.Math.Between(1, 6)}`,
           0,
+          e.detail.id,
           e.detail.velocity,
         );
 
         this.physics.add.collider(this.player, p, () => {
-          this.player.takeHit();
+          console.log(p.owner);
+          this.player.takeHit(p.owner);
           p.destroy();
         });
       },

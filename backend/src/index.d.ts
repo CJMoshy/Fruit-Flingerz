@@ -72,12 +72,12 @@ interface FireProjectileMsg extends Message {
   velocity: number;
 }
 
-interface NewProjectileMsg extends Message {
-  position: {
-    x: number;
-    y: number;
-  };
-  velocity: number;
+interface PlayerElimMsg {
+  byWho: UserID;
+}
+
+interface ElimLeaderMsg {
+  leader: UserID;
 }
 
 interface ServerToClientEvents {
@@ -89,7 +89,8 @@ interface ServerToClientEvents {
   userDisconnectMsg: (msg: UserDCMessage) => void;
   userLeftGameMsg: (msg: UserDCMessage) => void;
   userJoinedGameMsg: (msg: UserJoinedGameMsg) => void;
-  newProjectileEvent: (msg: NewProjectileMsg) => void;
+  newProjectileEvent: (msg: FireProjectileMsg) => void;
+  elimLeaderEvent: (msg: ElimLeaderMsg) => void;
 }
 
 interface ClientToServerEvents {
@@ -100,6 +101,7 @@ interface ClientToServerEvents {
   playerLeftGameEvent: (msg: UserDCMessage) => void;
   playerJoinedGameEvent: (msg: UserJoinedGameMsg) => void;
   fireProjectileEvent: (msg: FireProjectileMsg) => void;
+  playerEliminatedEvent: (msd: PlayerElimMsg) => void;
 }
 
 interface Projectile {

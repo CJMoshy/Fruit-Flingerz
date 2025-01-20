@@ -1,8 +1,8 @@
 import StateMachine, { State } from "../lib/StateMachine.ts";
-import ConnectionManager from "../lib/ConnectionManager.ts";
 import {
   exitScene,
   joinScene,
+  playerEliminated,
   sendProjectileEvent,
   sendUpdateEvent,
 } from "../lib/Socket.ts";
@@ -80,13 +80,28 @@ export default class Player extends Entity {
     });
   }
 
-  takeHit() {
-    if (this.hitPoints <= 0) {
-      console.log("player is eliminated");
-    } else {
-      this.hitPoints -= 1;
-      console.log(this.hitPoints);
+  takeHit(fromUser: UserID) {
+    this.hitPoints -= 1;
+    if (this.hitPoints < 1) {
+      console.log("player is eliminated by user", fromUser);
+      playerEliminated(fromUser);
+      this.respawn();
     }
+  }
+
+  respawn() {
+    this.hitPoints = 10;
+    this.body!.enable = false;
+    this.anims.play("disappearing-anim").once("animationcomplete", () => {
+      this.body!.enable = true;
+      this.setX(100).setY(100).setVelocity(0);
+      this.anims.play("appearing-anim").once(
+        "animationcomplete",
+        () => {
+          this.FSM.transition("idle");
+        },
+      );
+    });
   }
 
   returnToMenu() {
@@ -136,9 +151,9 @@ export default class Player extends Entity {
 }
 
 //spawn state
-
 class spawnState extends State {
   override enter(scene: Phaser.Scene, player: Player): void {
+    console.log("player spawn");
     player.anims.play("appearing-anim");
   }
 
@@ -240,6 +255,7 @@ class shootState extends State {
       player.y,
       `star-${Phaser.Math.Between(1, 6)}`,
       0,
+      player.userName,
       500,
       player.flipX ? -1 : 1,
     );
