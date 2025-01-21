@@ -133,7 +133,7 @@ export function sendProjectileEvent(data: FireProjectileMsg) {
 }
 
 export function logUserIn(loginMsg: LoginMessage) {
-  socket.emit("loginMsg", loginMsg);
+  socket.emit("loginEvent", loginMsg);
 }
 
 export function createLobby(lobbyName: string) {

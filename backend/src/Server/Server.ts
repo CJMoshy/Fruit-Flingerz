@@ -23,7 +23,7 @@ const sManager = new ServerManager();
 // base connection to the server, from any client
 io.on("connection", (socket) => {
   // listen for specific message types from the client
-  socket.on("loginMsg", (msg) => {
+  socket.on("loginEvent", (msg) => {
     // check if a user with the same username already exists in the list of current users
     if (sManager.getConnectedUserByID(msg.username) !== undefined) {
       console.log("A user tried to join that already exists");
@@ -165,6 +165,7 @@ io.on("connection", (socket) => {
     });
   });
 
+  // when players launch projectiles this comes in
   socket.on("fireProjectileEvent", (msg) => {
     // given that we can properly verify that projectile stuff is valid then allow below to execute
     if (msg.velocity > 500) {

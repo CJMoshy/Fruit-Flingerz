@@ -1,13 +1,13 @@
 export default class ServerManager {
+    public activeLobbies: Set<string>;
     private connectedUsers: ConnectedUser[];
     private spritesList: PlayerMetadata[];
-    public activeLobbies: Set<string>;
     private elimTracker: Map<string, Map<UserID, number>>;
 
     constructor() {
+        this.activeLobbies = new Set();
         this.connectedUsers = [];
         this.spritesList = [];
-        this.activeLobbies = new Set();
         this.elimTracker = new Map();
     }
 

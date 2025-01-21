@@ -70,7 +70,6 @@ export default class Play extends Phaser.Scene {
   preload(): void {}
 
   create(): void {
-  
     this.events.on("destroy", () => {
       console.log("destroy playScene");
       document.removeEventListener(
@@ -110,22 +109,38 @@ export default class Play extends Phaser.Scene {
     ) as Phaser.Tilemaps.TilemapLayer;
     collisionLayer.setCollisionByProperty({ collides: true });
 
+    const spawnLayer = map.getObjectLayer("Spawns")!;
+
     this.elimLeaderText = this.add.text(
       this.sys.canvas.width / 2,
       25,
       "Current Leader: ",
-    ).setOrigin(0.5);
+    ).setOrigin(0.5).setDepth(1);
+
+    // button to return to the menu
+    this.add.image(this.sys.canvas.width - 25, 25, "levelBtn").setInteractive()
+      .setDepth(1)
+      .on(
+        "pointerdown",
+        () => {
+          connectionManager.clearAllUsersFromSpritePool();
+          this.player.returnToMenu();
+        },
+      );
 
     //spawn player
+    const randSpawn =
+      spawnLayer.objects[Phaser.Math.Between(0, spawnLayer.objects.length - 1)];
     this.player = new Player(
       this,
-      100,
-      100,
+      randSpawn.x!,
+      randSpawn.y!,
       "appearing-anim",
       0,
       this.selectedCharModel,
       10,
       loginMsg.username,
+      spawnLayer.objects,
     );
 
     //define collision logic for player and map
@@ -139,24 +154,24 @@ export default class Play extends Phaser.Scene {
       }
     });
 
-    // button to return to the menu
-    this.add.image(this.sys.canvas.width - 25, 25, "levelBtn").setInteractive()
-      .on(
-        "pointerdown",
-        () => {
-          connectionManager.clearAllUsersFromSpritePool();
-          this.player.returnToMenu();
-        },
-      );
-
     this.events.on(
       "createProjectile",
       (e: CustomEvent<FireProjectileMsg>) => {
+        const fruits = [
+          "apple",
+          "bananas",
+          "kiwi",
+          "cherries",
+          "orange",
+          "melon",
+          "pineapple",
+          "strawberry",
+        ];
         const p = new Projectile(
           this,
           e.detail.position.x,
           e.detail.position.y,
-          `star-${Phaser.Math.Between(1, 6)}`,
+          fruits[Phaser.Math.Between(0, fruits.length - 1)],
           0,
           e.detail.id,
           e.detail.velocity,

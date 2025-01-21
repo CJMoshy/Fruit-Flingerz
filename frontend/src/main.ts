@@ -25,7 +25,7 @@ export const CONFIG: Phaser.Types.Core.GameConfig = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
+      // debug: true,
     },
   },
   dom: {

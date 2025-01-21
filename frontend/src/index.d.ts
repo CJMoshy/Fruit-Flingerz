@@ -1,3 +1,8 @@
+interface OtherSprites {
+  user_id: UserID;
+  entity: OpponentType;
+}
+
 type UserID = string;
 
 interface PlayerMetadata {
@@ -10,11 +15,6 @@ interface PlayerMetadata {
   currentAnimation: string | undefined;
   currentTexture: string | undefined;
   flipX: boolean;
-}
-
-interface OtherSprites {
-  user_id: UserID;
-  entity: OpponentType;
 }
 
 interface Message {
@@ -97,7 +97,7 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
-  loginMsg: (msg: loginMsg) => void;
+  loginEvent: (msg: LoginMessage) => void;
   createLobbyEvent: (msg: CreateLobbyMessage) => void;
   joinLobbyEvent: (msg: JoinLobbyMessage) => void;
   playerUpdateEvent: (msg: PlayerMetadata) => void;

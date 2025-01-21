@@ -8,7 +8,6 @@ import {
 } from "../lib/Socket.ts";
 import { loginMsg } from "../lib/Socket.ts";
 import Entity from "./Entity.ts";
-
 import Projectile from "./Projectile.ts";
 import { connectionManager } from "../main.ts";
 
@@ -20,7 +19,7 @@ export default class Player extends Entity {
   jumpCount: number;
   FSM: StateMachine;
   parentScene: Phaser.Scene;
-
+  private possibleSpawns: Phaser.Types.Tilemaps.TiledObject[];
   private metadataPingId: number;
   private metadataPingInterval = 20; // ping the server every 20ms (50 ping/second)
   constructor(
@@ -32,13 +31,25 @@ export default class Player extends Entity {
     charSprite: CharacterModel,
     hitPoints: number = 10,
     userName: string = "player",
+    possibleSpawns: Phaser.Types.Tilemaps.TiledObject[],
   ) {
-    super(scene, x, y, texture, frame, charSprite, hitPoints, userName);
+    super(
+      scene,
+      x,
+      y,
+      texture,
+      frame,
+      charSprite,
+      hitPoints,
+      userName,
+    );
 
     this.parentScene = scene;
 
     this.setGravityY(700);
 
+    // spawns
+    this.possibleSpawns = possibleSpawns;
     //movement logic
     this.VELOCITY = 200; //player speed
     this.JUMP_VELOCITY = -350; //jump speed
@@ -90,11 +101,13 @@ export default class Player extends Entity {
   }
 
   respawn() {
+    const newSpawn = this
+      .possibleSpawns[Phaser.Math.Between(0, this.possibleSpawns.length - 1)];
     this.hitPoints = 10;
     this.body!.enable = false;
     this.anims.play("disappearing-anim").once("animationcomplete", () => {
       this.body!.enable = true;
-      this.setX(100).setY(100).setVelocity(0);
+      this.setX(newSpawn.x).setY(newSpawn.y).setVelocity(0);
       this.anims.play("appearing-anim").once(
         "animationcomplete",
         () => {
@@ -249,17 +262,26 @@ class jumpState extends State {
 
 class shootState extends State {
   override enter(scene: Phaser.Scene, player: Player) {
+    const fruits = [
+      "apple",
+      "bananas",
+      "kiwi",
+      "cherries",
+      "orange",
+      "melon",
+      "pineapple",
+      "strawberry",
+    ];
     const p = new Projectile(
       scene,
       player.x,
       player.y,
-      `star-${Phaser.Math.Between(1, 6)}`,
+      fruits[Phaser.Math.Between(0, fruits.length - 1)],
       0,
       player.userName,
       500,
       player.flipX ? -1 : 1,
     );
-    // p.fire();
 
     connectionManager.getSpritePool().forEach((spr) => {
       scene.physics.add.overlap(spr.entity, p, () => p.destroy());

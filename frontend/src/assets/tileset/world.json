@@ -4,6 +4,78 @@
   "infinite": false,
   "layers": [
     {
+      "draworder": "topdown",
+      "id": 3,
+      "name": "Spawns",
+      "objects": [
+        {
+          "height": 0,
+          "id": 1,
+          "name": "spawn1",
+          "point": true,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 0,
+          "x": 66.4491978609626,
+          "y": 81.2958063608219
+        },
+        {
+          "height": 0,
+          "id": 2,
+          "name": "spawn3",
+          "point": true,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 0,
+          "x": 732.658973637302,
+          "y": 217.001970166057
+        },
+        {
+          "height": 0,
+          "id": 3,
+          "name": "spawn2",
+          "point": true,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 0,
+          "x": 479.664133596022,
+          "y": 278.731400694249
+        },
+        {
+          "height": 0,
+          "id": 4,
+          "name": "spawn5",
+          "point": true,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 0,
+          "x": 708.646026831785,
+          "y": 480.785814804391
+        },
+        {
+          "height": 0,
+          "id": 5,
+          "name": "spawn4",
+          "point": true,
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 0,
+          "x": 139.699690402477,
+          "y": 479.587109484942
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
       "data": [
         89,
         90,
@@ -2017,8 +2089,8 @@
       "y": 0
     }
   ],
-  "nextlayerid": 3,
-  "nextobjectid": 1,
+  "nextlayerid": 4,
+  "nextobjectid": 6,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",
@@ -2068,16 +2140,6 @@
         },
         {
           "id": 110,
-          "properties": [
-            {
-              "name": "collides",
-              "type": "bool",
-              "value": true
-            }
-          ]
-        },
-        {
-          "id": 111,
           "properties": [
             {
               "name": "collides",
