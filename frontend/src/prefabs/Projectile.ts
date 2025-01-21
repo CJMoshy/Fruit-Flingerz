@@ -24,10 +24,10 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
 
     this.owner = owner;
     this.velocity = velocity;
+    
     if (dx) {
       this.dx = dx;
     } else this.dx = 1;
-    // this.dx = dx;
     this.directionVector = this.determineDirection();
 
     this.body?.world.on(

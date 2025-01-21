@@ -14,8 +14,8 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     texture: string = "appearing-anim",
     frame: number = 0,
     charSprite: CharacterModel,
-    userName: UserID,
     hitPoints: number,
+    userName: UserID,
   ) {
     super(scene, x, y, texture, frame);
 

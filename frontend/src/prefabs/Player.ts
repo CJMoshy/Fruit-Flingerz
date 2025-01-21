@@ -30,10 +30,10 @@ export default class Player extends Entity {
     texture: string = "appearing-anim",
     frame: number,
     charSprite: CharacterModel,
-    userName: string = "player",
     hitPoints: number = 10,
+    userName: string = "player",
   ) {
-    super(scene, x, y, texture, frame, charSprite, userName, hitPoints);
+    super(scene, x, y, texture, frame, charSprite, hitPoints, userName);
 
     this.parentScene = scene;
 
@@ -259,7 +259,7 @@ class shootState extends State {
       500,
       player.flipX ? -1 : 1,
     );
-    p.fire();
+    // p.fire();
 
     connectionManager.getSpritePool().forEach((spr) => {
       scene.physics.add.overlap(spr.entity, p, () => p.destroy());

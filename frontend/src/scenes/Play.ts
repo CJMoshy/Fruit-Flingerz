@@ -70,7 +70,7 @@ export default class Play extends Phaser.Scene {
   preload(): void {}
 
   create(): void {
-    // this doesnt seem to remove the event
+  
     this.events.on("destroy", () => {
       console.log("destroy playScene");
       document.removeEventListener(
@@ -88,6 +88,7 @@ export default class Play extends Phaser.Scene {
         this.elimLeaderListener as EventListener,
       );
     });
+
     //load backgorund
     if (this.textures.exists("BG-purple")) {
       this.playScreen = this.add.tileSprite(0, 0, 800, 640, "BG-purple")
@@ -123,8 +124,8 @@ export default class Play extends Phaser.Scene {
       "appearing-anim",
       0,
       this.selectedCharModel,
-      loginMsg.username,
       10,
+      loginMsg.username,
     );
 
     //define collision logic for player and map

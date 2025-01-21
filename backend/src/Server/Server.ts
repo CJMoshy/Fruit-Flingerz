@@ -165,9 +165,12 @@ io.on("connection", (socket) => {
     });
   });
 
-  // end pseudo except lines 215 and 216
   socket.on("fireProjectileEvent", (msg) => {
     // given that we can properly verify that projectile stuff is valid then allow below to execute
+    if (msg.velocity > 500) {
+      console.log("trying to fire projectile at an increased speed");
+      return;
+    }
     const user = sManager.getConnectedUserByID(msg.id);
     if (!user) return;
 
@@ -211,11 +214,6 @@ io.on("connection", (socket) => {
       console.log("might have a hacker or something");
       return;
     }
-    console.log(
-      terminator,
-      "just eliminated",
-      eliminatedPlayer,
-    );
     sManager.updatePlayersElimCount(terminator.lobby, terminator.id); // can be written better
     const leader = sManager.getElimLeader(terminator.lobby);
     if (!leader) return;

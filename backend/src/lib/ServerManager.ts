@@ -129,6 +129,12 @@ export default class ServerManager {
         });
     }
 
+    /**
+     * pass in a lobby name to register it to the tracker.
+     * This will keep track of players in the lobby and thier associated
+     * eliminations
+     * @param lobbyName name of the lobby to register to tracker
+     */
     registerLobbyToElimTracker(lobbyName: string) {
         if (this.elimTracker.has(lobbyName)) {
             console.log(
@@ -139,7 +145,6 @@ export default class ServerManager {
         const players = this.connectedUsers.filter((user) =>
             user.lobby === lobbyName
         ).map((user) => [user.id, 0]);
-        console.log(players);
         const playerStats = new Map();
         for (const [key, value] of players) {
             playerStats.set(key, value);
@@ -147,6 +152,11 @@ export default class ServerManager {
         this.elimTracker.set(lobbyName, playerStats);
     }
 
+    /**
+     * pass in lobby name and user id to add the user to the lobbys tracker
+     * @param lobbyName name of the lobby to add the user to
+     * @param uid user id to add to the lobbys elim tracker
+     */
     addPlayerToLobbyElimTracker(lobbyName: string, uid: UserID) {
         if (this.elimTracker.has(lobbyName) == false) {
             console.log(
@@ -155,15 +165,20 @@ export default class ServerManager {
             return;
         }
         const map = this.elimTracker.get(lobbyName)!;
-        if (map?.has(uid)) {
+        if (map.has(uid)) {
             console.log(
-                "trying to register a player to the elim tracker map that already existed in the lobby",
+                `trying to register a player ${uid} to the elim tracker map that was already registered`,
             );
             return;
         }
         map.set(uid, 0);
     }
 
+    /**
+     * pass in lobby name and user id to remove the user from that lobbys elim tracker
+     * @param lobbyName lobby to remove user from tracker
+     * @param uid user to remove from tracker
+     */
     removePlayerFromLobbyElimTracker(lobbyName: string, uid: UserID) {
         if (this.elimTracker.has(lobbyName) == false) {
             console.log(
@@ -172,7 +187,7 @@ export default class ServerManager {
             return;
         }
         const map = this.elimTracker.get(lobbyName)!;
-        if (map?.has(uid) === false) {
+        if (map.has(uid) === false) {
             console.log(
                 `failed to find a player ${uid} to remove from the elim tracker`,
             );
@@ -180,7 +195,11 @@ export default class ServerManager {
         }
         map.delete(uid);
     }
-
+    /**
+     * pass in lobby name and userid to increment the users eliminations by one
+     * @param lobbyName lobby name to look for user in
+     * @param uid user to look for
+     */
     updatePlayersElimCount(lobbyName: string, uid: UserID) {
         if (this.elimTracker.has(lobbyName) == false) {
             console.log(
@@ -197,10 +216,13 @@ export default class ServerManager {
             return;
         }
         map.set(uid, map.get(uid)! + 1);
-
-        console.log(map);
     }
-
+    /**
+     * pass in lobby name to get the elim leader in that lobby
+     * (if lobby is registered to hjave elim tracker)
+     * @param lobbyName lobby to search for elim tracker leader
+     * @returns
+     */
     getElimLeader(lobbyName: string) {
         if (this.elimTracker.has(lobbyName) == false) {
             console.log(

@@ -10,7 +10,7 @@ export default class Opponent extends Entity {
     charSprite: CharacterModel,
     name?: string,
   ) {
-    super(scene, x, y, texture, frame, charSprite, name ? name : "any", 0);
+    super(scene, x, y, texture, frame, charSprite, 10, name ? name : "any");
     scene.events.on("update", this.update, this);
   }
 
