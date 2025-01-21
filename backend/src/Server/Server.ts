@@ -208,6 +208,7 @@ io.on("connection", (socket) => {
     });
   });
 
+  // player gets eliminated
   socket.on("playerEliminatedEvent", (msg) => {
     const eliminatedPlayer = sManager.getConnectedUserBySocketID(socket.id);
     const terminator = sManager.getConnectedUserByID(msg.byWho);
@@ -215,9 +216,9 @@ io.on("connection", (socket) => {
       console.log("might have a hacker or something");
       return;
     }
-    sManager.updatePlayersElimCount(terminator.lobby, terminator.id); // can be written better
+    sManager.updatePlayersElimCount(terminator.lobby, terminator.id);
     const leader = sManager.getElimLeader(terminator.lobby);
     if (!leader) return;
-    io.to(terminator.lobby).emit("elimLeaderEvent", { leader: leader });
+    io.to(terminator.lobby).emit("elimLeaderEvent", { leader: leader }); // send new elim leader to lobby
   });
 });

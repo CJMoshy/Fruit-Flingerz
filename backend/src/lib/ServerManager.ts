@@ -158,7 +158,7 @@ export default class ServerManager {
      * @param uid user id to add to the lobbys elim tracker
      */
     addPlayerToLobbyElimTracker(lobbyName: string, uid: UserID) {
-        if (this.elimTracker.has(lobbyName) == false) {
+        if (this.elimTracker.has(lobbyName) === false) {
             console.log(
                 "trying to find lobby in elim tracker that does not exist",
             );
@@ -180,7 +180,7 @@ export default class ServerManager {
      * @param uid user to remove from tracker
      */
     removePlayerFromLobbyElimTracker(lobbyName: string, uid: UserID) {
-        if (this.elimTracker.has(lobbyName) == false) {
+        if (this.elimTracker.has(lobbyName) === false) {
             console.log(
                 "trying to find lobby in elim tracker that does not exist",
             );
@@ -201,7 +201,7 @@ export default class ServerManager {
      * @param uid user to look for
      */
     updatePlayersElimCount(lobbyName: string, uid: UserID) {
-        if (this.elimTracker.has(lobbyName) == false) {
+        if (this.elimTracker.has(lobbyName) === false) {
             console.log(
                 "trying to find lobby in elim tracker that does not exist",
             );
@@ -224,7 +224,7 @@ export default class ServerManager {
      * @returns
      */
     getElimLeader(lobbyName: string) {
-        if (this.elimTracker.has(lobbyName) == false) {
+        if (this.elimTracker.has(lobbyName) === false) {
             console.log(
                 "trying to find lobby in elim tracker that does not exist",
             );

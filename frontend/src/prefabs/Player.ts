@@ -151,14 +151,13 @@ export default class Player extends Entity {
   }
 
   determineTexture() {
-    if (!this.anims.isPlaying) {
-      if (this.body?.velocity.y !== undefined && this.body.velocity.y < 0) {
-        this.setTexture(`${this.characterSprite}-jump`);
-      } else if (
-        this.body?.velocity.y !== undefined && this.body.velocity.y > 0
-      ) {
-        this.setTexture(`${this.characterSprite}-fall`);
-      }
+    if (this.anims.isPlaying) return;
+    if (this.body!.velocity.y < 0) {
+      this.setTexture(`${this.characterSprite}-jump`);
+    } else if (
+      this.body!.velocity.y > 0
+    ) {
+      this.setTexture(`${this.characterSprite}-fall`);
     }
   }
 }
@@ -166,43 +165,34 @@ export default class Player extends Entity {
 //spawn state
 class spawnState extends State {
   override enter(scene: Phaser.Scene, player: Player): void {
-    console.log("player spawn");
-    player.anims.play("appearing-anim");
-  }
-
-  override execute(scene: Phaser.Scene, player: Player): void {
-    if (!player.anims.isPlaying) {
+    player.anims.play("appearing-anim").once("animationcomplete", () => {
       this.stateMachine.transition("idle");
-    }
+    });
   }
+  override execute(scene: Phaser.Scene, player: Player): void {}
 }
 
 //idle state
 class idleState extends State {
-  override enter() {
-    // console.log("in idle player state");
+  override enter(scene: Phaser.Scene, player: Player) {
+    player.anims.play(`${player["characterSprite"]}-idle`);
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
-    if (player.body?.velocity.y === 0 && !player.anims.isPlaying) {
-      player.anims.play(`${player["characterSprite"]}-idle`);
-    } else player.determineTexture();
+    if (
+      Phaser.Input.Keyboard.JustDown(player.keys.up) &&
+      player.isJumping === false
+    ) {
+      this.stateMachine.transition("jump");
+    }
 
-    if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
-      if (this.stateMachine !== undefined && player.isJumping === false) {
-        player.anims.stop();
-        this.stateMachine.transition("jump");
-      }
-    } else if (Phaser.Input.Keyboard.JustDown(player.keys.space)) {
+    if (Phaser.Input.Keyboard.JustDown(player.keys.space)) {
       this.stateMachine.transition("shoot");
     }
 
-    if (player.body?.blocked.down) {
+    if (player.body!.blocked.down) {
       if (player.keys.left.isDown || player.keys.right.isDown) {
-        if (this.stateMachine !== undefined) {
-          player.anims.stop();
-          this.stateMachine.transition("move");
-        }
+        this.stateMachine.transition("move");
       }
     }
   }
@@ -211,51 +201,65 @@ class idleState extends State {
 //moving state
 class moveState extends State {
   override enter(scene: Phaser.Scene, player: Player) {
-    // console.log("in move player State");
-    player.anims.stop();
     player.anims.play(`${player["characterSprite"]}-run`);
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
-    if (Phaser.Input.Keyboard.JustDown(player.keys.up)) {
-      if (this.stateMachine !== undefined && player.isJumping === false) {
-        player.anims.stop();
-        this.stateMachine.transition("jump");
-      }
-    }
-
-    if (!(player.keys.left.isDown || player.keys.right.isDown)) {
-      if (this.stateMachine !== undefined) {
-        player.anims.stop();
-        this.stateMachine.transition("idle");
-      }
+    player.handleMovement();
+    if (
+      Phaser.Input.Keyboard.JustDown(player.keys.up) &&
+      player.isJumping === false
+    ) {
+      this.stateMachine.transition("jump");
     }
 
     if (Phaser.Input.Keyboard.JustDown(player.keys.space)) {
       this.stateMachine.transition("shoot");
     }
-    player.handleMovement();
+
+    if (
+      player.keys.left.isDown === false && player.keys.right.isDown === false &&
+      player.body?.blocked.down
+    ) {
+      player.setVelocity(0);
+      this.stateMachine.transition("idle");
+    }
+
+    if (
+      player.body?.blocked.down === false
+    ) {
+      player.anims.stop();
+    } else {
+      if (player.anims.isPlaying === false) {
+        player.anims.play(`${player["characterSprite"]}-run`);
+      }
+    }
   }
 }
 
 class jumpState extends State {
-  override enter(scene: Phaser.Scene, player: Player) {
+  jump(player: Player) {
     player.jumpCount += 1;
-    // console.log("in jump player State", player.jumpCount);
     player.setVelocityY(player.JUMP_VELOCITY);
 
     if (player.jumpCount === 2) {
       player.anims.play(`${player["characterSprite"]}-dbJmp`);
       player.isJumping = true;
     }
+  }
 
-    // if (player.body?.velocity.y !== undefined) {
-    //     player.setVelocityY(player.body?.velocity.y + player.JUMP_VELOCITY) //hard mode ?
-    // }
-    setTimeout(() => this.stateMachine.transition("idle"), 500);
+  override enter(scene: Phaser.Scene, player: Player) {
+    player.anims.stop();
+    this.jump(player);
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
+    console.log("in jump");
+    if (
+      Phaser.Input.Keyboard.JustDown(player.keys.up) && player.jumpCount === 1
+    ) {
+      this.jump(player);
+    }
     player.handleMovement();
   }
 }

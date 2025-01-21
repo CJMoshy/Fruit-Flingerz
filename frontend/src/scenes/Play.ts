@@ -111,6 +111,7 @@ export default class Play extends Phaser.Scene {
 
     const spawnLayer = map.getObjectLayer("Spawns")!;
 
+    //text at the top of the screen to show elim leader in lobby
     this.elimLeaderText = this.add.text(
       this.sys.canvas.width / 2,
       25,
@@ -145,11 +146,12 @@ export default class Play extends Phaser.Scene {
 
     //define collision logic for player and map
     this.physics.add.collider(this.player, collisionLayer, () => {
-      if (this.player !== null) {
-        this.player.setVelocity(0);
-        if (this.player.body?.blocked.down === true) {
+      if (this.player.body!.blocked.down === true) {
+        if (this.player.FSM.state === "jump") {
           this.player.isJumping = false;
           this.player.jumpCount = 0;
+          this.player.setVelocity(0);
+          this.player.FSM.transition("idle");
         }
       }
     });
