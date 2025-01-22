@@ -190,10 +190,12 @@ class idleState extends State {
       this.stateMachine.transition("shoot");
     }
 
-    if (player.body!.blocked.down) {
-      if (player.keys.left.isDown || player.keys.right.isDown) {
-        this.stateMachine.transition("move");
-      }
+    if (
+      player.body!.blocked.down &&
+      (player.keys.left.isDown || player.keys.right.isDown)
+    ) {
+      player.anims.stop();
+      this.stateMachine.transition("move");
     }
   }
 }
@@ -201,38 +203,44 @@ class idleState extends State {
 //moving state
 class moveState extends State {
   override enter(scene: Phaser.Scene, player: Player) {
-    player.anims.play(`${player["characterSprite"]}-run`);
+    console.log("moce state");
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
     player.handleMovement();
+
     if (
       Phaser.Input.Keyboard.JustDown(player.keys.up) &&
       player.isJumping === false
     ) {
+      console.log("jump keyt");
       this.stateMachine.transition("jump");
+      return;
     }
 
     if (Phaser.Input.Keyboard.JustDown(player.keys.space)) {
       this.stateMachine.transition("shoot");
     }
 
+    // on a surface but not pressing any buttons
     if (
       player.keys.left.isDown === false && player.keys.right.isDown === false &&
       player.body?.blocked.down
     ) {
       player.setVelocity(0);
       this.stateMachine.transition("idle");
+      return;
     }
 
     if (
       player.body?.blocked.down === false
     ) {
       player.anims.stop();
-    } else {
-      if (player.anims.isPlaying === false) {
-        player.anims.play(`${player["characterSprite"]}-run`);
-      }
+    }
+
+    if (player.anims.isPlaying === false && player.body?.blocked.down) {
+      console.log("no anim playing and player is on gorund");
+      player.anims.play(`${player["characterSprite"]}-run`);
     }
   }
 }
@@ -254,7 +262,6 @@ class jumpState extends State {
   }
 
   override execute(scene: Phaser.Scene, player: Player) {
-    console.log("in jump");
     if (
       Phaser.Input.Keyboard.JustDown(player.keys.up) && player.jumpCount === 1
     ) {
