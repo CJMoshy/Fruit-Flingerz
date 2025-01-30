@@ -1,8 +1,9 @@
 #phaser-game {
   margin-top: 10px;
   justify-self: center;
-  width: 1000px;
-  height: 800px;
+  width: 950px;
+  height: 775px;
+  aspect-ratio: 1/1;
   background-color: black;
   border-radius: 20%;
 }
@@ -15,11 +16,22 @@
   flex-direction: column;
 }
 
-.password-container {
-  position: relative;
-  display: inline-block;
-}
-
 button {
   margin-top: 5px;
+}
+
+.game-title{
+  text-align: center;
+  margin-top: 20px;
+  font-family: monospace;
+}
+
+@media screen and (min-width: 1920px) {
+  .game-container{
+    display: flex;
+    justify-content: space-evenly
+  }
+  .login-container{
+    align-self: center;
+  }
 }

@@ -11,24 +11,15 @@
     <title>Fruit Flingerz by Xerxseize</title>
   </head>
   <body>
-    <div id="phaser-game"></div>
-    <div class="login-container">
-      <input type="text" id="username-field" placeholder="Username" />
-      <!-- <div class="password-container">
-        <input
-          type="password"
-          id="password-field"
-          placeholder="Password"
-        />
-        <input
-          type="password"
-          id="password-confirm-field"
-          placeholder="Confirm Password"
-        />
-      </div> -->
-      <button id="login-btn">play</button>
-      <button id="disconnect-btn" disabled>disconnect</button>
-      <button id="reconnect-btn" disabled>reconnect</button>
+    <h1 class="game-title">Fruit Flingerz</h1>
+    <div class="game-container">
+      <div id="phaser-game"></div>
+      <div class="login-container">
+        <input type="text" id="username-field" placeholder="Username" />
+        <button id="login-btn">play</button>
+        <button id="disconnect-btn" disabled>disconnect</button>
+        <button id="reconnect-btn" disabled>reconnect</button>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

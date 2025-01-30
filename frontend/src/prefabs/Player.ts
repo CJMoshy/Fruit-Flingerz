@@ -67,7 +67,6 @@ export default class Player extends Entity {
       idle: new idleState(),
       move: new moveState(),
       jump: new jumpState(),
-      shoot: new shootState(),
     }, [scene, this]);
 
     joinScene(this.userName, texture);
@@ -91,7 +90,20 @@ export default class Player extends Entity {
     });
   }
 
+  override update(): void {
+    super.update();
+    this.FSM.step();
+    this.determineTexture();
+
+    if (Phaser.Input.Keyboard.JustDown(this.keys.space)) {
+      this.shoot_fruit();
+    }
+  }
+
   takeHit(fromUser: UserID) {
+    setTimeout(() => {
+      this.setVelocity(0);
+    }, 50);
     this.hitPoints -= 1;
     if (this.hitPoints < 1) {
       console.log("player is eliminated by user", fromUser);
@@ -129,12 +141,6 @@ export default class Player extends Entity {
     );
   }
 
-  override update(): void {
-    super.update();
-    this.FSM.step();
-    this.determineTexture();
-  }
-
   handleMovement() {
     const vector = new Phaser.Math.Vector2(0, 0);
 
@@ -160,6 +166,42 @@ export default class Player extends Entity {
       this.setTexture(`${this.characterSprite}-fall`);
     }
   }
+
+  shoot_fruit() {
+    const fruits = [
+      "apple",
+      "bananas",
+      "kiwi",
+      "cherries",
+      "orange",
+      "melon",
+      "pineapple",
+      "strawberry",
+    ];
+    const p = new Projectile(
+      this.parentScene,
+      this.x,
+      this.y,
+      fruits[Phaser.Math.Between(0, fruits.length - 1)],
+      0,
+      this.userName,
+      500,
+      this.flipX ? -1 : 1,
+    );
+
+    connectionManager.getSpritePool().forEach((spr) => {
+      this.parentScene.physics.add.overlap(spr.entity, p, () => p.destroy());
+    });
+
+    sendProjectileEvent({
+      id: this.userName,
+      position: {
+        x: this.x,
+        y: this.y,
+      },
+      velocity: 500 * (this.flipX ? -1 : 1),
+    });
+  }
 }
 
 //spawn state
@@ -184,10 +226,6 @@ class idleState extends State {
       player.isJumping === false
     ) {
       this.stateMachine.transition("jump");
-    }
-
-    if (Phaser.Input.Keyboard.JustDown(player.keys.space)) {
-      this.stateMachine.transition("shoot");
     }
 
     if (
@@ -216,10 +254,6 @@ class moveState extends State {
       console.log("jump keyt");
       this.stateMachine.transition("jump");
       return;
-    }
-
-    if (Phaser.Input.Keyboard.JustDown(player.keys.space)) {
-      this.stateMachine.transition("shoot");
     }
 
     // on a surface but not pressing any buttons
@@ -268,48 +302,5 @@ class jumpState extends State {
       this.jump(player);
     }
     player.handleMovement();
-  }
-}
-
-class shootState extends State {
-  override enter(scene: Phaser.Scene, player: Player) {
-    const fruits = [
-      "apple",
-      "bananas",
-      "kiwi",
-      "cherries",
-      "orange",
-      "melon",
-      "pineapple",
-      "strawberry",
-    ];
-    const p = new Projectile(
-      scene,
-      player.x,
-      player.y,
-      fruits[Phaser.Math.Between(0, fruits.length - 1)],
-      0,
-      player.userName,
-      500,
-      player.flipX ? -1 : 1,
-    );
-
-    connectionManager.getSpritePool().forEach((spr) => {
-      scene.physics.add.overlap(spr.entity, p, () => p.destroy());
-    });
-
-    sendProjectileEvent({
-      id: player.userName,
-      position: {
-        x: player.x,
-        y: player.y,
-      },
-      velocity: 500 * (player.flipX ? -1 : 1),
-    });
-    this.stateMachine.transition("idle");
-  }
-
-  override execute() {
-    // no implementation needed
   }
 }
