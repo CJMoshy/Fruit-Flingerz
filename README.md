@@ -48,8 +48,8 @@ more eliminations you get, the closer you are to victory!
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/fruit-flingerz.git
-cd fruit-flingerz
+git clone (https://github.com/CJMoshy/Fruit-Flingerz.git)
+cd Fruit-Flingerz
 ```
 
 2. Install dependencies:
