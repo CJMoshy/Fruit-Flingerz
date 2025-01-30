@@ -20,18 +20,18 @@ button {
   margin-top: 5px;
 }
 
-.game-title{
+.game-title {
   text-align: center;
   margin-top: 20px;
   font-family: monospace;
 }
 
 @media screen and (min-width: 1920px) {
-  .game-container{
+  .game-container {
     display: flex;
-    justify-content: space-evenly
+    justify-content: space-evenly;
   }
-  .login-container{
+  .login-container {
     align-self: center;
   }
 }

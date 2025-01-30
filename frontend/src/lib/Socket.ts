@@ -7,7 +7,6 @@ export const loginMsg: LoginMessage = {
   password: "",
 };
 
-
 const URL = "http://127.0.0.1:3000/";
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
