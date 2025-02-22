@@ -4,6 +4,7 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
   public userName: string;
 
   protected hitPoints: number;
+  protected constHealth: number; // does not get modified when player take dmg, used for reset health
 
   protected namePlate: Phaser.GameObjects.Text;
 
@@ -15,7 +16,7 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     frame: number = 0,
     charSprite: CharacterModel,
     hitPoints: number,
-    userName: UserID,
+    userName: UserID
   ) {
     super(scene, x, y, texture, frame);
 
@@ -29,15 +30,19 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     //base player info
     this.userName = userName;
     this.hitPoints = hitPoints;
+    this.constHealth = hitPoints;
 
-    this.namePlate = scene.add.text(this.x, this.y - 20, this.userName)
+    this.namePlate = scene.add
+      .text(this.x, this.y - 20, this.userName)
       .setOrigin(0.5);
   }
 
   update(...args: any[]): void {
     this.updateNamePlate();
   }
-
+  public healthReset() {
+    this.hitPoints = this.constHealth;
+  }
   public removeNamePlate() {
     this.namePlate.destroy();
   }

@@ -10,14 +10,10 @@ export default class Play extends Phaser.Scene {
   private elimLeaderText!: Phaser.GameObjects.Text;
 
   private userJoinedGameListener: (
-    e: CustomEvent<UserJoinedGameEventDetail>,
+    e: CustomEvent<UserJoinedGameEventDetail>
   ) => void;
-  private createProjectileListener: (
-    e: CustomEvent<FireProjectileMsg>,
-  ) => void;
-  private elimLeaderListener: (
-    e: CustomEvent<ElimLeaderMsg>,
-  ) => void;
+  private createProjectileListener: (e: CustomEvent<FireProjectileMsg>) => void;
+  private elimLeaderListener: (e: CustomEvent<ElimLeaderMsg>) => void;
 
   private TILE_SCROLL_RATE = 0.75;
   constructor() {
@@ -29,7 +25,7 @@ export default class Play extends Phaser.Scene {
         console.log(
           "playScene should be active right now, adding",
           e.detail,
-          " to the spritepool",
+          " to the spritepool"
         );
         connectionManager.addUserToSpritePool(this, e.detail.id);
       }
@@ -49,17 +45,17 @@ export default class Play extends Phaser.Scene {
 
     document.addEventListener(
       "userJoinedGame",
-      this.userJoinedGameListener as EventListener,
+      this.userJoinedGameListener as EventListener
     );
 
     document.addEventListener(
       "createProjectile",
-      this.createProjectileListener as EventListener,
+      this.createProjectileListener as EventListener
     );
 
     document.addEventListener(
       "elimLeader",
-      this.elimLeaderListener as EventListener,
+      this.elimLeaderListener as EventListener
     );
   }
 
@@ -74,23 +70,24 @@ export default class Play extends Phaser.Scene {
       console.log("destroy playScene");
       document.removeEventListener(
         "userJoinedGame",
-        this.userJoinedGameListener as EventListener,
+        this.userJoinedGameListener as EventListener
       );
 
       document.removeEventListener(
         "createProjectile",
-        this.createProjectileListener as EventListener,
+        this.createProjectileListener as EventListener
       );
 
       document.removeEventListener(
         "elimLeader",
-        this.elimLeaderListener as EventListener,
+        this.elimLeaderListener as EventListener
       );
     });
 
     //load backgorund
     if (this.textures.exists("BG-purple")) {
-      this.playScreen = this.add.tileSprite(0, 0, 800, 640, "BG-purple")
+      this.playScreen = this.add
+        .tileSprite(0, 0, 800, 640, "BG-purple")
         .setOrigin(0);
     }
 
@@ -101,33 +98,31 @@ export default class Play extends Phaser.Scene {
     const map = this.add.tilemap("tilemapJSON");
     const tileset = map.addTilesetImage(
       "base-tileset-pixel-adv",
-      "base-tileset",
+      "base-tileset"
     ) as Phaser.Tilemaps.Tileset;
     const collisionLayer = map.createLayer(
       "collideLayer",
-      tileset,
+      tileset
     ) as Phaser.Tilemaps.TilemapLayer;
     collisionLayer.setCollisionByProperty({ collides: true });
 
     const spawnLayer = map.getObjectLayer("Spawns")!;
 
     //text at the top of the screen to show elim leader in lobby
-    this.elimLeaderText = this.add.text(
-      this.sys.canvas.width / 2,
-      25,
-      "Current Leader: ",
-    ).setOrigin(0.5).setDepth(1);
+    this.elimLeaderText = this.add
+      .text(this.sys.canvas.width / 2, 25, "Current Leader: ")
+      .setOrigin(0.5)
+      .setDepth(1);
 
     // button to return to the menu
-    this.add.image(this.sys.canvas.width - 25, 25, "levelBtn").setInteractive()
+    this.add
+      .image(this.sys.canvas.width - 25, 25, "levelBtn")
+      .setInteractive()
       .setDepth(1)
-      .on(
-        "pointerdown",
-        () => {
-          connectionManager.clearAllUsersFromSpritePool();
-          this.player.returnToMenu();
-        },
-      );
+      .on("pointerdown", () => {
+        connectionManager.clearAllUsersFromSpritePool();
+        this.player.returnToMenu();
+      });
 
     //spawn player
     const randSpawn =
@@ -139,9 +134,9 @@ export default class Play extends Phaser.Scene {
       "appearing-anim",
       0,
       this.selectedCharModel,
-      10,
+      3,
       loginMsg.username,
-      spawnLayer.objects,
+      spawnLayer.objects
     );
 
     //define collision logic for player and map
@@ -156,36 +151,34 @@ export default class Play extends Phaser.Scene {
       }
     });
 
-    this.events.on(
-      "createProjectile",
-      (e: CustomEvent<FireProjectileMsg>) => {
-        const fruits = [
-          "apple",
-          "bananas",
-          "kiwi",
-          "cherries",
-          "orange",
-          "melon",
-          "pineapple",
-          "strawberry",
-        ];
-        const p = new Projectile(
-          this,
-          e.detail.position.x,
-          e.detail.position.y,
-          fruits[Phaser.Math.Between(0, fruits.length - 1)],
-          0,
-          e.detail.id,
-          e.detail.velocity,
-        );
+    this.events.on("createProjectile", (e: CustomEvent<FireProjectileMsg>) => {
+      const fruits = [
+        "apple",
+        "bananas",
+        "kiwi",
+        "cherries",
+        "orange",
+        "melon",
+        "pineapple",
+        "strawberry",
+      ];
 
-        this.physics.add.collider(this.player, p, () => {
-          console.log(p.owner);
-          this.player.takeHit(p.owner);
-          p.destroy();
-        });
-      },
-    );
+      const p = new Projectile(
+        this,
+        e.detail.position.x,
+        e.detail.position.y,
+        fruits[Phaser.Math.Between(0, fruits.length - 1)],
+        0,
+        e.detail.id,
+        e.detail.velocity
+      );
+
+      this.physics.add.collider(this.player, p, () => {
+        console.log(p.owner);
+        this.player.takeHit(p.owner);
+        p.destroy();
+      });
+    });
   }
 
   update(): void {

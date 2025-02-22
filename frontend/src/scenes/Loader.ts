@@ -26,10 +26,10 @@ import player4Fall from "../assets/img/characters/char04/char04_fall.png";
 import player4dbJmp from "../assets/spritesheets/char04/char04_dbJmp.png";
 
 import pinkBG from "../assets/img/backgrounds/Pink.png";
-import blueBG from "../assets/img/backgrounds/blue.png";
-import grayBG from "../assets/img/backgrounds/gray.png";
-import greenBG from "../assets/img/backgrounds/green.png";
-import purpleBG from "../assets/img/backgrounds/purple.png";
+import blueBG from "../assets/img/backgrounds/Blue.png";
+import grayBG from "../assets/img/backgrounds/Gray.png";
+import greenBG from "../assets/img/backgrounds/Green.png";
+import purpleBG from "../assets/img/backgrounds/Purple.png";
 
 import selectNoHover from "../assets/img/buttons/select/select_no_hover.png";
 import selectHover from "../assets/img/buttons/select/select_hover.png";
@@ -47,12 +47,14 @@ import star6 from "../assets/img/star/star6.png";
 
 import apple from "../assets/spritesheets/fruits/Apple.png";
 import bananas from "../assets/spritesheets/fruits/Bananas.png";
-import cherries from "../assets/spritesheets/fruits/cherries.png";
+import cherries from "../assets/spritesheets/fruits/Cherries.png";
 import kiwi from "../assets/spritesheets/fruits/Kiwi.png";
 import melon from "../assets/spritesheets/fruits/Melon.png";
 import orange from "../assets/spritesheets/fruits/Orange.png";
 import pineapple from "../assets/spritesheets/fruits/Pineapple.png";
 import strawberry from "../assets/spritesheets/fruits/Strawberry.png";
+
+import heart from '../assets/img/star/heart.png';
 
 export default class Loader extends Phaser.Scene {
   constructor() {
@@ -95,6 +97,10 @@ export default class Loader extends Phaser.Scene {
     this.load.image("star-4", star4);
     this.load.image("star-5", star5);
     this.load.image("star-6", star6);
+
+    //heart
+    this.load.image('heart', heart);
+    
     //appearing and disappearing animation
     this.load.spritesheet("appear", Appearing, {
       frameWidth: 96,

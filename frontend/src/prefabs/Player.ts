@@ -19,9 +19,12 @@ export default class Player extends Entity {
   jumpCount: number;
   FSM: StateMachine;
   parentScene: Phaser.Scene;
+
   private possibleSpawns: Phaser.Types.Tilemaps.TiledObject[];
   private metadataPingId: number;
   private metadataPingInterval = 20; // ping the server every 20ms (50 ping/second)
+
+  private healthImageContainer: Phaser.GameObjects.Image[];
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -31,18 +34,9 @@ export default class Player extends Entity {
     charSprite: CharacterModel,
     hitPoints: number = 10,
     userName: string = "player",
-    possibleSpawns: Phaser.Types.Tilemaps.TiledObject[],
+    possibleSpawns: Phaser.Types.Tilemaps.TiledObject[]
   ) {
-    super(
-      scene,
-      x,
-      y,
-      texture,
-      frame,
-      charSprite,
-      hitPoints,
-      userName,
-    );
+    super(scene, x, y, texture, frame, charSprite, hitPoints, userName);
 
     this.parentScene = scene;
 
@@ -56,18 +50,22 @@ export default class Player extends Entity {
     this.isJumping = false;
     this.jumpCount = 0;
     this.keys = scene.input.keyboard?.addKeys({
-      "left": Phaser.Input.Keyboard.KeyCodes.A,
-      "right": Phaser.Input.Keyboard.KeyCodes.D,
-      "up": Phaser.Input.Keyboard.KeyCodes.W,
-      "space": Phaser.Input.Keyboard.KeyCodes.SPACE,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D,
+      up: Phaser.Input.Keyboard.KeyCodes.W,
+      space: Phaser.Input.Keyboard.KeyCodes.SPACE,
     }) as Phaser.Types.Input.Keyboard.CursorKeys;
 
-    this.FSM = new StateMachine("spawn", {
-      spawn: new spawnState(),
-      idle: new idleState(),
-      move: new moveState(),
-      jump: new jumpState(),
-    }, [scene, this]);
+    this.FSM = new StateMachine(
+      "spawn",
+      {
+        spawn: new spawnState(),
+        idle: new idleState(),
+        move: new moveState(),
+        jump: new jumpState(),
+      },
+      [scene, this]
+    );
 
     joinScene(this.userName, texture);
 
@@ -88,6 +86,9 @@ export default class Player extends Entity {
     this.on("destroy", () => {
       clearInterval(this.metadataPingId);
     });
+
+    this.healthImageContainer = [];
+    this.updateHealthDispaly();
   }
 
   override update(): void {
@@ -100,11 +101,26 @@ export default class Player extends Entity {
     }
   }
 
+  updateHealthDispaly() {
+    if (this.healthImageContainer.length > 0) {
+      this.healthImageContainer.forEach((image) => image.destroy());
+      this.healthImageContainer.length = 0;
+    }
+
+    for (let x = 0; x < this.hitPoints; x++) {
+      this.healthImageContainer.push(
+        this.scene.add.image(42 + x * 42, 50, "heart", 0).setScale(0.75)
+      );
+    }
+  }
+
   takeHit(fromUser: UserID) {
     setTimeout(() => {
       this.setVelocity(0);
     }, 50);
+
     this.hitPoints -= 1;
+    this.updateHealthDispaly();
     if (this.hitPoints < 1) {
       console.log("player is eliminated by user", fromUser);
       playerEliminated(fromUser);
@@ -113,32 +129,29 @@ export default class Player extends Entity {
   }
 
   respawn() {
-    const newSpawn = this
-      .possibleSpawns[Phaser.Math.Between(0, this.possibleSpawns.length - 1)];
-    this.hitPoints = 10;
+    const newSpawn =
+      this.possibleSpawns[
+        Phaser.Math.Between(0, this.possibleSpawns.length - 1)
+      ];
+    this.healthReset();
     this.body!.enable = false;
     this.anims.play("disappearing-anim").once("animationcomplete", () => {
       this.body!.enable = true;
       this.setX(newSpawn.x).setY(newSpawn.y).setVelocity(0);
-      this.anims.play("appearing-anim").once(
-        "animationcomplete",
-        () => {
-          this.FSM.transition("idle");
-        },
-      );
+      this.anims.play("appearing-anim").once("animationcomplete", () => {
+        this.FSM.transition("idle");
+      });
+      this.updateHealthDispaly();
     });
   }
 
   returnToMenu() {
-    this.anims.play("disappearing-anim").on(
-      "animationcomplete",
-      () => {
-        super.removeFromScene();
-        exitScene(this.userName);
-        this.parentScene.scene.stop("playScene");
-        this.parentScene.scene.start("menuScene");
-      },
-    );
+    this.anims.play("disappearing-anim").on("animationcomplete", () => {
+      super.removeFromScene();
+      exitScene(this.userName);
+      this.parentScene.scene.stop("playScene");
+      this.parentScene.scene.start("menuScene");
+    });
   }
 
   handleMovement() {
@@ -160,9 +173,7 @@ export default class Player extends Entity {
     if (this.anims.isPlaying) return;
     if (this.body!.velocity.y < 0) {
       this.setTexture(`${this.characterSprite}-jump`);
-    } else if (
-      this.body!.velocity.y > 0
-    ) {
+    } else if (this.body!.velocity.y > 0) {
       this.setTexture(`${this.characterSprite}-fall`);
     }
   }
@@ -186,7 +197,7 @@ export default class Player extends Entity {
       0,
       this.userName,
       500,
-      this.flipX ? -1 : 1,
+      this.flipX ? -1 : 1
     );
 
     connectionManager.getSpritePool().forEach((spr) => {
@@ -258,7 +269,8 @@ class moveState extends State {
 
     // on a surface but not pressing any buttons
     if (
-      player.keys.left.isDown === false && player.keys.right.isDown === false &&
+      player.keys.left.isDown === false &&
+      player.keys.right.isDown === false &&
       player.body?.blocked.down
     ) {
       player.setVelocity(0);
@@ -266,9 +278,7 @@ class moveState extends State {
       return;
     }
 
-    if (
-      player.body?.blocked.down === false
-    ) {
+    if (player.body?.blocked.down === false) {
       player.anims.stop();
     }
 
@@ -297,7 +307,8 @@ class jumpState extends State {
 
   override execute(scene: Phaser.Scene, player: Player) {
     if (
-      Phaser.Input.Keyboard.JustDown(player.keys.up) && player.jumpCount === 1
+      Phaser.Input.Keyboard.JustDown(player.keys.up) &&
+      player.jumpCount === 1
     ) {
       this.jump(player);
     }

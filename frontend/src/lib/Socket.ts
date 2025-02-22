@@ -7,11 +7,10 @@ export const loginMsg: LoginMessage = {
   password: "",
 };
 
-const URL = "http://127.0.0.1:3000/";
+// const URL = "http://192.168.1.244:3000/";
+const URL = "http://localhost:3000/";
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  URL,
-);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(URL);
 
 socket.on("connect", () => {
   console.log("conncted");
@@ -62,7 +61,7 @@ socket.on("userJoinedGameMsg", (msg) => {
   document.dispatchEvent(
     new CustomEvent<UserJoinedGameEventDetail>("userJoinedGame", {
       detail: { id: msg.id },
-    }),
+    })
   );
 });
 
@@ -112,13 +111,13 @@ socket.on("newProjectileEvent", (msg) => {
   document.dispatchEvent(
     new CustomEvent<FireProjectileMsg>("createProjectile", {
       detail: msg,
-    }),
+    })
   );
 });
 
 socket.on("elimLeaderEvent", (msg) => {
   document.dispatchEvent(
-    new CustomEvent<ElimLeaderMsg>("elimLeader", { detail: msg }),
+    new CustomEvent<ElimLeaderMsg>("elimLeader", { detail: msg })
   );
 });
 /**
