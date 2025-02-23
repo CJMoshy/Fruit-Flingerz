@@ -171,7 +171,7 @@ export default class Play extends Phaser.Scene {
         0,
         e.detail.id,
         e.detail.velocity
-      );
+      ).setScale(1.2);
 
       this.physics.add.collider(this.player, p, () => {
         console.log(p.owner);

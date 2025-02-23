@@ -198,10 +198,30 @@ export default class Player extends Entity {
       this.userName,
       500,
       this.flipX ? -1 : 1
-    );
+    ).setScale(1.2);
 
     connectionManager.getSpritePool().forEach((spr) => {
-      this.parentScene.physics.add.overlap(spr.entity, p, () => p.destroy());
+      this.parentScene.physics.add.overlap(spr.entity, p, () => {
+        const e = this.scene.add
+          .particles(
+            spr.entity.x,
+            spr.entity.y,
+            `star-${Phaser.Math.Between(1, 6)}`,
+            {
+              speed: { min: 100, max: 300 },
+              angle: { min: 0, max: 360 },
+              scale: { start: 1, end: 0 },
+              quantity: 10,
+              lifespan: 500,
+            }
+          )
+          .explode();
+        setTimeout(() => {
+          e?.destroy();
+          console.log(e);
+        }, 1000);
+        p.destroy();
+      });
     });
 
     sendProjectileEvent({

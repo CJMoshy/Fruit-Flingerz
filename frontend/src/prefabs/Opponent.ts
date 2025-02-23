@@ -8,9 +8,9 @@ export default class Opponent extends Entity {
     texture: string = "appearing-anim",
     frame: number,
     charSprite: CharacterModel,
-    name?: string,
+    name?: string
   ) {
-    super(scene, x, y, texture, frame, charSprite, 10, name ? name : "any");
+    super(scene, x, y, texture, frame, charSprite, 0, name ? name : "any");
     scene.events.on("update", this.update, this);
   }
 

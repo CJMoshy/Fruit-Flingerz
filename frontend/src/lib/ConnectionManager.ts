@@ -35,7 +35,7 @@ export default class ConnectionManager {
       "appearing-anim",
       0,
       data!.currentTexture as CharacterModel,
-      data!.user_id,
+      data!.user_id
     );
     this.spritePool.push({ user_id: id, entity: opp });
   }
@@ -55,7 +55,7 @@ export default class ConnectionManager {
   removeUser(id: UserID): void {
     if (this.connectedPlayers.delete(id) === false) {
       console.log(
-        "attemping to remove user that was not in the connected users list",
+        "attemping to remove user that was not in the connected users list"
       );
       return;
     }
@@ -64,12 +64,12 @@ export default class ConnectionManager {
   }
 
   removeUserFromSpritePool(id: UserID) {
-    const spriteToRemoveIndex = this.spritePool.findIndex((sprite) =>
-      sprite.user_id === id
+    const spriteToRemoveIndex = this.spritePool.findIndex(
+      (sprite) => sprite.user_id === id
     );
     if (spriteToRemoveIndex === -1) {
       console.log(
-        "attempting to remove a sprite from the pool that does not exist",
+        "attempting to remove a sprite from the pool that does not exist"
       );
       return;
     }
@@ -91,11 +91,9 @@ export default class ConnectionManager {
    */
   createUsers(scene: Phaser.Scene): void {
     for (const player of this.connectedPlayers) {
-      if (
-        this.playersInGame.has(player[0]) === false
-      ) {
+      if (this.playersInGame.has(player[0]) === false) {
         console.log(
-          `attempting to load in character ${player[0]} but char is in menu`,
+          `attempting to load in character ${player[0]} but char is in menu`
         );
         continue;
       }
@@ -104,10 +102,7 @@ export default class ConnectionManager {
   }
 
   // check user in map and update TODO this might have bricked shit
-  setUserMetadata(
-    id: UserID,
-    data: PlayerMetadata,
-  ): void {
+  setUserMetadata(id: UserID, data: PlayerMetadata): void {
     if (this.connectedPlayers.has(id) === false) return;
     this.connectedPlayers.set(id, data as PlayerMetadata);
   }
@@ -140,8 +135,9 @@ export default class ConnectionManager {
       const xPos = this.connectedPlayers.get(spr.user_id)?.position.x;
       const yPos = this.connectedPlayers.get(spr.user_id)?.position.y;
       const animKey = this.connectedPlayers.get(spr.user_id)?.currentAnimation;
-      const currentTexture = this.connectedPlayers.get(spr.user_id)
-        ?.currentTexture;
+      const currentTexture = this.connectedPlayers.get(
+        spr.user_id
+      )?.currentTexture;
       const xFlip = this.connectedPlayers.get(spr.user_id)?.flipX; // careful
 
       spr.entity.setFlipX(xFlip as boolean);
