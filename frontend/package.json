@@ -1,9 +1,10 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.5",
   "type": "module",
-  "author": "CJMoshy",
+  "author": "CJ Moshy",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

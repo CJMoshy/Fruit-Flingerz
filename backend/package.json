@@ -1,7 +1,7 @@
 {
-  "name": "backend",
-  "version": "0.1.0",
-  "main": "index.js",
+  "name": "fruitflingerz_backend",
+  "version": "0.1.5",
+  "main": "Server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc --watch",
@@ -9,8 +9,8 @@
   },
   "keywords": [],
   "author": "CJMoshy",
-  "license": "ISC",
-  "description": "",
+  "license": "MIT",
+  "description": "Backend server for lobby hosting",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",

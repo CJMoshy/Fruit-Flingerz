@@ -21,7 +21,7 @@ more eliminations you get, the closer you are to victory!
 - **Dynamic Gameplay**: Jump, dodge, and launch your fruit projectiles
   strategically
 
-## Technology Stack
+## Tech Stack
 
 ### Frontend
 
@@ -40,8 +40,8 @@ more eliminations you get, the closer you are to victory!
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm or yarn package manager
+- Node.js (v14 or higher), Deno should also work
+- npm or a given package manager
 
 ### Installation
 
